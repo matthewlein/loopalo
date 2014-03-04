@@ -47,7 +47,7 @@ function renderGrid(canvas, gridPixelSize, color) {
 
 
 // ------------------------------------------------------------------------- //
-// App
+// App vars
 // ------------------------------------------------------------------------- //
 
 
@@ -56,7 +56,6 @@ var ctx = canvas.getContext('2d');
 
 var cWidth = 1800;
 var cHeight = 1200;
-
 
 canvas.width = cWidth;
 canvas.height = cHeight;
@@ -281,69 +280,7 @@ Line.prototype.draw = function(){
 // line.draw();
 
 
-// ------------------------------------------------------------------------- //
-// One complete line
-// ------------------------------------------------------------------------- //
 
-
-
-var startX = ( randomRange(0, tilesX) * tileSize );
-var startY = ( randomRange(0, tilesY) * tileSize );
-var startDir = randomRange(0, 3);
-
-var line = new Line( startX, startY, startDir );
-
-/*
-
-ctx.beginPath();
-ctx.moveTo(line.x, line.y);
-for (var i = 0; i < 70; i++) {
-    line.advance();
-    // ctx.stroke();
-}
-ctx.strokeStyle = 'yellow';
-ctx.lineWidth = 50;
-ctx.stroke();
-ctx.strokeStyle = 'blue';
-ctx.lineWidth = 30;
-ctx.stroke();
-ctx.strokeStyle = '#f00';
-ctx.lineWidth = 10;
-ctx.stroke();
-
-ctx.closePath();
-
-*/
-
-
-
-
-// ------------------------------------------------------------------------- //
-// many lines
-// ------------------------------------------------------------------------- //
-
-var lineCount = 30;
-var lineSteps = 70;
-var color1 = '#41abe6';
-var width1 = 33;
-var color2 = '#c3d2a0';
-var width2 = 30;
-var color3 = '#41abe6';
-var width3 = 10;
-
-var gui = new dat.GUI();
-
-gui.add(window, 'lineCount', 1, 100);
-gui.add(window, 'lineSteps', 1, 200);
-gui.addColor(window, 'color1');
-gui.add(window, 'width1', 0, 100);
-gui.addColor(window, 'color2');
-gui.add(window, 'width2', 0, 100);
-gui.addColor(window, 'color3');
-gui.add(window, 'width3', 0, 100);
-gui.add(window, 'tileSize', 20, 300);
-
-gui.add(window, 'drawAll');
 
 function getTileSizes() {
     halfTile = tileSize / 2;
@@ -352,11 +289,41 @@ function getTileSizes() {
     tilesY = cHeight / tileSize;
 }
 
-function savePNG() {
+// ------------------------------------------------------------------------- //
+// Line drawing
+// ------------------------------------------------------------------------- //
 
-}
+// number of lines drawn
+var lineCount = 30;
 
-function drawAll() {
+// how long each line is
+var lineLength = 70;
+
+// the strokes on the paths
+var strokes = [
+    {
+        color : '#41abe6',
+        width : 10,
+        cap : 'round'
+    },
+    {
+        color : '#c3d2a0',
+        width : 30,
+        cap : 'round'
+    },
+    {
+        color : '#41abe6',
+        width : 33,
+        cap : 'round'
+    }
+];
+
+function drawNew() {
+
+    var startX;
+    var startY;
+    var startDir;
+    var line;
 
     getTileSizes();
 
@@ -372,40 +339,97 @@ function drawAll() {
 
         ctx.beginPath();
         ctx.moveTo(line.x, line.y);
-        for (var i = 0; i < lineSteps; i++) {
+        for (var i = 0; i < lineLength; i++) {
             line.advance();
         }
-        // draw lines if they have a width
-        if (!!width1) {
-            ctx.strokeStyle = color1;
-            ctx.lineWidth = width1;
-            ctx.stroke();
-        }
-        if (!!width2) {
-            ctx.strokeStyle = color2;
-            ctx.lineWidth = width2;
-            ctx.stroke();
-        }
-        if (!!width3) {
-            ctx.strokeStyle = color3;
-            ctx.lineWidth = width3;
-            ctx.stroke();
-        }
 
 
+        var item;
+        for (var k = strokes.length - 1; k >= 0; k--) {
+            item = strokes[k];
 
+            if (!!item.width) {
+                ctx.strokeStyle = item.color;
+                ctx.lineWidth = item.width;
+                ctx.lineCap = item.cap;
+                ctx.stroke();
+            }
+        }
 
         ctx.closePath();
 
-        // faded bg?
-        // ctx.save();
-        // ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
-        // ctx.fillRect ( 0, 0, cWidth, cHeight) ;
-        // ctx.restore();
     }
 
     ctx.restore();
 }
 
 
-drawAll();
+function addStroke() {
+
+    var maxWidthStroke = _.max( strokes, function(stroke) {
+        return stroke.width;
+    });
+
+    var maxWidth = maxWidthStroke.width;
+
+    var newStrokeIndex = strokes.length;
+
+    strokes.push({
+        color : '#000',
+        width : maxWidth + 5,
+        cap : 'round'
+    });
+
+    var newStroke = strokes[newStrokeIndex];
+
+    var folder = gui.addFolder('Stroke ' + (strokes.length) );
+    folder.add(newStroke, 'width', 0, 100);
+    folder.addColor(newStroke, 'color');
+    folder.add(newStroke, 'cap', ['round', 'square', 'butt']);
+    folder.open();
+
+}
+
+// ------------------------------------------------------------------------- //
+// GUI creation
+// ------------------------------------------------------------------------- //
+
+var gui;
+
+function createGUI() {
+    gui = new dat.GUI();
+
+    var globals = gui.addFolder('Global Options');
+
+    globals.add(window, 'lineCount', 1, 100);
+    globals.add(window, 'lineLength', 1, 200);
+    globals.add(window, 'tileSize', 20, 300);
+    globals.open();
+
+    var methods = gui.addFolder('Actions');
+
+    methods.add(window, 'drawNew');
+    methods.add(window, 'addStroke');
+    methods.open();
+
+    _.each(strokes, function(item, index) {
+        var folder = gui.addFolder('Stroke ' + (index + 1) );
+        folder.add(item, 'width', 0, 100);
+        folder.addColor(item, 'color');
+        folder.add(item, 'cap', ['round', 'square', 'butt']);
+        folder.open();
+    });
+
+
+}
+
+// ------------------------------------------------------------------------- //
+// Init
+// ------------------------------------------------------------------------- //
+
+function init() {
+    createGUI();
+    drawNew();
+}
+
+init();
