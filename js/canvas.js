@@ -318,6 +318,15 @@ var strokes = [
     }
 ];
 
+var bgColor = '#F3F5DF';
+
+function drawBg() {
+    ctx.save();
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, cWidth, cHeight);
+    ctx.restore();
+}
+
 function drawNew() {
 
     var startX;
@@ -327,7 +336,12 @@ function drawNew() {
 
     getTileSizes();
 
+    // clear all
     ctx.clearRect(0, 0, cWidth, cHeight);
+
+    // draw bg
+    drawBg();
+
     ctx.save();
 
     for (var j = 0; j < lineCount; j++) {
@@ -404,6 +418,7 @@ function createGUI() {
     globals.add(window, 'lineCount', 1, 100);
     globals.add(window, 'lineLength', 1, 200);
     globals.add(window, 'tileSize', 20, 300);
+    globals.addColor(window, 'bgColor');
     globals.open();
 
     var methods = gui.addFolder('Actions');
