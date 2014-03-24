@@ -266,6 +266,17 @@ function onResize() {
     });
 }
 
+function onClick(event) {
+
+    var line = new Line({
+        x : event.x,
+        y : event.y
+    });
+
+    line.drawPath();
+
+}
+
 // ------------------------------------------------------------------------- //
 // Line drawing
 // ------------------------------------------------------------------------- //
@@ -419,6 +430,7 @@ function init() {
     drawNew();
     var throttledResize = _.throttle(onResize, 300);
     window.addEventListener('resize', throttledResize, false);
+    canvas.click(onClick);
 }
 
 init();
