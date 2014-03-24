@@ -1,10 +1,11 @@
 @import 'compass/css3';
 
+.svg-wrapper {
+    overflow: hidden;
+}
+
 svg {
     display: block;
-    outline: 1px solid grey;
-    margin: auto;
-    /*background-color: #F3F5DF;*/
 }
 svg path {
     stroke-dasharray: 6000;
