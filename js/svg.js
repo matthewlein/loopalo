@@ -42,13 +42,29 @@ var moves = [
 // Line
 // ------------------------------------------------------------------------- //
 
-function Line( x, y, dir, tileSize ) {
-    this.x = x;
-    this.y = y;
-    this.dir = dir;
+function Line( opts ) {
+
+    opts = opts || {};
+
+    // griddy
+    this.x = opts.x || ( randomRange(0, tilesX) * tileSize );
+    this.y = opts.y || ( randomRange(0, tilesY) * tileSize );
+
+    // griddy but kinda random
+    // this.x = opts.x || randomRange(0, cWidth);
+    // this.y = opt.y || randomRange(0, cHeight);
+
+    this.dir = opts.dir || randomRange(0, 3);
+    this.steps = opts.steps || lineLength;
+
     // start with M move to x, y
-    this.pathString = 'M ' + x + ' ' + y + ' ';
-    // this.tileSize = tileSize;
+    this.pathString = 'M ' + this.x + ' ' + this.y + ' ';
+
+    // set later when its drawn
+    this.path = null;
+
+    // if you want individual tile sizes
+    // this.tileSize = opts.tileSize || tileSize;
 }
 
 //
@@ -197,9 +213,39 @@ Line.prototype.getNextMove = function() {
 
 };
 
+Line.prototype.drawPath = function() {
+
+    var stroke;
+
+    // advance lineLength steps on this line
+    for (var i = 0; i < this.steps; i++) {
+        this.advance();
+    }
+
+    // using a for loop so it draws backwards
+    for (var k = strokes.length - 1; k >= 0; k--) {
+        stroke = strokes[k];
+
+        // if the stroke has a width
+        if (!!stroke.width) {
+
+            // make a path
+            this.path = canvas.path(this.pathString);
+
+            this.path.attr({
+                stroke: stroke.color,
+                strokeWidth: stroke.width,
+                strokeLinecap : stroke.cap,
+                fill : 'none'
+            });
+
+        }
+    }
+};
+
 
 // ------------------------------------------------------------------------- //
-// Instance
+// Getting stuff
 // ------------------------------------------------------------------------- //
 
 function getTileSizes() {
@@ -207,6 +253,17 @@ function getTileSizes() {
 
     tilesX = cWidth / tileSize;
     tilesY = cHeight / tileSize;
+}
+
+function onResize() {
+    cWidth = window.innerWidth;
+    cHeight = window.innerHeight;
+    getTileSizes();
+    // set canvas size
+    canvas.attr({
+        width : cWidth,
+        height : cHeight
+    });
 }
 
 // ------------------------------------------------------------------------- //
@@ -244,7 +301,7 @@ var bgRect;
 
 function drawBg() {
     // svg doesn't have a bg color, using rect instead
-    var bgRect = canvas.rect( 0, 0, cWidth, cHeight);
+    var bgRect = canvas.rect( 0, 0, '100%', '100%');
     bgRect.attr({
         fill : bgColor
     });
@@ -253,12 +310,12 @@ function drawBg() {
 
 function drawNew() {
 
-    var startX;
-    var startY;
-    var startDir;
-    var line;
-    var currentPath;
+    // var startX;
+    // var startY;
+    // var startDir;
     // var tileSize;
+
+    var line;
 
     getTileSizes();
 
@@ -272,46 +329,21 @@ function drawNew() {
     for (var j = 0; j < lineCount; j++) {
 
         // griddy
-        startX = ( randomRange(0, tilesX) * tileSize );
-        startY = ( randomRange(0, tilesY) * tileSize );
+        // startX = ( randomRange(0, tilesX) * tileSize );
+        // startY = ( randomRange(0, tilesY) * tileSize );
 
         // griddy but kinda random
         // startX = randomRange(0, cWidth);
         // startY = randomRange(0, cHeight);
 
-        startDir = randomRange(0, 3);
+        // startDir = randomRange(0, 3);
 
         // for random tile sizes
         // tileSize = randomRange(20, 200);
 
-        line = new Line( startX, startY, startDir );
+        line = new Line();
 
-        // advance lineLength steps on this line
-        for (var i = 0; i < lineLength; i++) {
-            line.advance();
-        }
-
-        var stroke;
-
-        // using a for loop so it draws backwards
-        for (var k = strokes.length - 1; k >= 0; k--) {
-            stroke = strokes[k];
-
-            // if the stroke has a width
-            if (!!stroke.width) {
-
-                // make a path
-                currentPath = canvas.path(line.pathString);
-
-                currentPath.attr({
-                    stroke: stroke.color,
-                    strokeWidth: stroke.width,
-                    strokeLinecap : stroke.cap,
-                    fill : 'none'
-                });
-
-            }
-        }
+        line.drawPath();
 
     }
 
@@ -375,7 +407,6 @@ function createGUI() {
         folder.open();
     });
 
-
 }
 
 // ------------------------------------------------------------------------- //
@@ -383,8 +414,11 @@ function createGUI() {
 // ------------------------------------------------------------------------- //
 
 function init() {
+    onResize();
     createGUI();
     drawNew();
+    var throttledResize = _.throttle(onResize, 300);
+    window.addEventListener('resize', throttledResize, false);
 }
 
 init();
