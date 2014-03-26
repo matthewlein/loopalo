@@ -4,6 +4,11 @@
 
 svg {
   display: block;
+  cursor: pointer;
+}
+
+svg.drawing {
+  cursor: d;
 }
 
 svg path {
@@ -43,6 +48,11 @@ svg path {
   to {
     stroke-dashoffset: 0;
   }
+}
+.gui-container {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 /*# sourceMappingURL=style.css.map */

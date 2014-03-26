@@ -10,7 +10,7 @@ function randomRange(low, high) {
 // App vars
 // ------------------------------------------------------------------------- //
 
-
+var body = window.document.body;
 var canvas = Snap('#svg');
 
 var cWidth = 1200;
@@ -65,6 +65,8 @@ function Line( opts ) {
 
     // if you want individual tile sizes
     // this.tileSize = opts.tileSize || tileSize;
+
+    return this;
 }
 
 //
@@ -239,6 +241,8 @@ Line.prototype.drawPath = function() {
                 fill : 'none'
             });
 
+            console.log( Snap.path.getTotalLength(this.path) );
+
         }
     }
 };
@@ -255,27 +259,6 @@ function getTileSizes() {
     tilesY = cHeight / tileSize;
 }
 
-function onResize() {
-    cWidth = window.innerWidth;
-    cHeight = window.innerHeight;
-    getTileSizes();
-    // set canvas size
-    canvas.attr({
-        width : cWidth,
-        height : cHeight
-    });
-}
-
-function onClick(event) {
-
-    var line = new Line({
-        x : event.x,
-        y : event.y
-    });
-
-    line.drawPath();
-
-}
 
 // ------------------------------------------------------------------------- //
 // Line drawing
@@ -318,8 +301,15 @@ function drawBg() {
     });
 }
 
+function clearCanvas() {
+    // clear all
+    canvas.clear();
+    // draw bg
+    drawBg();
+}
 
-function drawNew() {
+
+function drawManyLines() {
 
     // var startX;
     // var startY;
@@ -329,12 +319,6 @@ function drawNew() {
     var line;
 
     getTileSizes();
-
-    // clear all
-    canvas.clear();
-
-    // draw bg
-    drawBg();
 
     // draw all the lines
     for (var j = 0; j < lineCount; j++) {
@@ -394,7 +378,16 @@ function addStroke() {
 var gui;
 
 function createGUI() {
-    gui = new dat.GUI();
+
+    var guiContainer = document.getElementById('gui-container');
+
+    gui = new dat.GUI({
+        autoPlace : false
+    });
+    guiContainer.appendChild(gui.domElement);
+    guiContainer.addEventListener('mousedown', function(event){
+        event.stopPropagation();
+    }, false);
 
     var globals = gui.addFolder('Global Options');
 
@@ -406,8 +399,9 @@ function createGUI() {
 
     var methods = gui.addFolder('Actions');
 
-    methods.add(window, 'drawNew');
+    methods.add(window, 'drawManyLines');
     methods.add(window, 'addStroke');
+    methods.add(window, 'clearCanvas');
     methods.open();
 
     _.each(strokes, function(stroke, index) {
@@ -419,6 +413,106 @@ function createGUI() {
     });
 
 }
+// ------------------------------------------------------------------------- //
+// Events
+// ------------------------------------------------------------------------- //
+
+// yoinked from jQuery
+function normalizeEvent(event) {
+    var eventDoc;
+    var doc;
+    var body;
+
+    // Calculate pageX/Y if missing and clientX/Y available
+    if ( event.pageX == null && event.clientX != null ) {
+        eventDoc = event.target.ownerDocument || document;
+        doc = eventDoc.documentElement;
+        body = eventDoc.body;
+
+        event.pageX = event.clientX + ( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) - ( doc && doc.clientLeft || body && body.clientLeft || 0 );
+        event.pageY = event.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
+    }
+
+    return event;
+}
+
+
+function onResize() {
+    cWidth = window.innerWidth;
+    cHeight = window.innerHeight;
+    getTileSizes();
+    // set canvas size
+    canvas.attr({
+        width : cWidth,
+        height : cHeight
+    });
+}
+
+
+function onClick(event) {
+
+    var line = new Line({
+        x : event.x,
+        y : event.y
+    });
+
+    line.drawPath();
+
+}
+
+var pointerX;
+var pointerY;
+var lineInterval;
+
+function onPress(event) {
+    // normalize
+    normalizeEvent(event);
+    // save X and Y
+    pointerX = event.pageX;
+    pointerY = event.pageY;
+
+    // make line
+    var line = new Line({
+        x : pointerX,
+        y : pointerY
+    });
+    line.drawPath();
+    // add event listeners for move
+    body.addEventListener('mousemove', onMove, false);
+    // start interval/timeout
+    lineInterval = setInterval(function(){
+        var line = new Line({
+            x : pointerX,
+            y : pointerY
+        });
+        line.drawPath();
+    }, (1000/6) );
+}
+
+function onMove(event) {
+    // save the current X and Y
+    normalizeEvent(event);
+    pointerX = event.pageX;
+    pointerY = event.pageY;
+}
+
+function onRelease(event) {
+    console.log('release');
+    // clear interval
+    clearInterval(lineInterval);
+    // remove move listeners
+    body.removeEventListener('mousemove', onMove, false);
+}
+
+
+function bindEvents() {
+    body.addEventListener('mousedown', onPress, false);
+    body.addEventListener('mouseup', onRelease, false);
+    // canvas.click(onClick);
+    // resize
+    var throttledResize = _.throttle(onResize, 300);
+    window.addEventListener('resize', throttledResize, false);
+}
 
 // ------------------------------------------------------------------------- //
 // Init
@@ -427,10 +521,9 @@ function createGUI() {
 function init() {
     onResize();
     createGUI();
-    drawNew();
-    var throttledResize = _.throttle(onResize, 300);
-    window.addEventListener('resize', throttledResize, false);
-    canvas.click(onClick);
+    drawBg();
+    // drawManyLines();
+    bindEvents();
 }
 
 init();
