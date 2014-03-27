@@ -13,12 +13,10 @@ svg.drawing {
 }
 
 svg path {
-    stroke-dasharray: 6000;
-    stroke-dashoffset: 6000;
-    // -webkit-animation: dash 5s linear;
-    // -webkit-animation-fill-mode: forwards;
-    @include animation(dash 5s linear);
-    @include animation-fill-mode(forwards);
+    stroke-dashoffset: 0;
+    // @include animation(dash 5s linear);
+    // @include animation-fill-mode(forwards);
+    @include transition(stroke-dashoffset 5s linear);
 }
 
 @include keyframes(dash) {

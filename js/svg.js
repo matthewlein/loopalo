@@ -63,6 +63,8 @@ function Line( opts ) {
     // set later when its drawn
     this.path = null;
 
+    this.group = canvas.g();
+
     // if you want individual tile sizes
     // this.tileSize = opts.tileSize || tileSize;
 
@@ -218,6 +220,24 @@ Line.prototype.getNextMove = function() {
 Line.prototype.drawPath = function() {
 
     var stroke;
+    var pathLength;
+    var pathSpeed;
+    // sets how fast the lines are drawn in px/sec
+    var drawSpeed = 2000;
+
+
+    function animatePath(path, speed) {
+
+        var prefixedDuration = Modernizr.prefixed('transitionDuration');
+        var duration = speed + 's';
+
+        // necessary so the transition works as XXXX then 0
+        setTimeout(function() {
+            // debugger
+            path.node.style[prefixedDuration] = duration;
+            path.attr('strokeDashoffset', 0);
+        }, 0);
+    }
 
     // advance lineLength steps on this line
     for (var i = 0; i < this.steps; i++) {
@@ -234,18 +254,29 @@ Line.prototype.drawPath = function() {
             // make a path
             this.path = canvas.path(this.pathString);
 
+            pathLength = Snap.path.getTotalLength(this.path);
+            pathLength = Math.ceil(pathLength);
+
             this.path.attr({
                 stroke: stroke.color,
                 strokeWidth: stroke.width,
                 strokeLinecap : stroke.cap,
+                strokeDashoffset : pathLength,
+                strokeDasharray : pathLength,
                 fill : 'none'
             });
 
-            console.log( Snap.path.getTotalLength(this.path) );
+            pathSpeed = pathLength / drawSpeed;
+
+            animatePath(this.path, pathSpeed);
+            // add to the group
+            this.group.add(this.path);
 
         }
     }
+
 };
+
 
 
 // ------------------------------------------------------------------------- //
@@ -372,47 +403,42 @@ function addStroke() {
 }
 
 // ------------------------------------------------------------------------- //
-// GUI creation
+// Mode
 // ------------------------------------------------------------------------- //
 
-var gui;
+var mode = 'draw';
 
-function createGUI() {
+function onModeChange(value) {
 
-    var guiContainer = document.getElementById('gui-container');
+    var gs = canvas.selectAll('g');
 
-    gui = new dat.GUI({
-        autoPlace : false
-    });
-    guiContainer.appendChild(gui.domElement);
-    guiContainer.addEventListener('mousedown', function(event){
-        event.stopPropagation();
-    }, false);
+    if (value === 'erase') {
+        // consider:
+        // bindDrawEvents();
+        // unbindEraseEvents();
 
-    var globals = gui.addFolder('Global Options');
+        // unbind normal draw events
+        unbindEvents();
+        gs.forEach(function(group) {
+            // group hover
+            group.hover(onGroupOver, onGroupOut, group, group);
+            group.click(onGroupClick);
+        });
+    } else {
+        // consider:
+        // bindDrawEvents();
+        // unbindEraseEvents();
 
-    globals.add(window, 'lineCount', 1, 100);
-    globals.add(window, 'lineLength', 1, 200);
-    globals.add(window, 'tileSize', 20, 300);
-    globals.addColor(window, 'bgColor');
-    globals.open();
-
-    var methods = gui.addFolder('Actions');
-
-    methods.add(window, 'drawManyLines');
-    methods.add(window, 'addStroke');
-    methods.add(window, 'clearCanvas');
-    methods.open();
-
-    _.each(strokes, function(stroke, index) {
-        var folder = gui.addFolder('Stroke ' + (index + 1) );
-        folder.add(stroke, 'width', 0, 100);
-        folder.addColor(stroke, 'color');
-        folder.add(stroke, 'cap', ['round', 'square', 'butt']);
-        folder.open();
-    });
-
+        bindEvents();
+        gs.forEach(function(group) {
+            // unbind listeners
+            group.unhover(onGroupOver, onGroupOut);
+            group.unclick(onGroupClick);
+        });
+    }
 }
+
+
 // ------------------------------------------------------------------------- //
 // Events
 // ------------------------------------------------------------------------- //
@@ -497,14 +523,37 @@ function onMove(event) {
 }
 
 function onRelease(event) {
-    console.log('release');
     // clear interval
     clearInterval(lineInterval);
     // remove move listeners
     body.removeEventListener('mousemove', onMove, false);
 }
 
+//
+// For groups on erase
+//
+var invert = canvas.filter( Snap.filter.invert(1) );
 
+function onGroupOver() {
+    this.attr({
+        filter : invert
+    });
+}
+function onGroupOut() {
+    this.attr({
+        filter : null
+    });
+}
+function onGroupClick() {
+    this.remove();
+}
+
+
+// binding starting
+function unbindEvents() {
+    body.removeEventListener('mousedown', onPress, false);
+    body.removeEventListener('mouseup', onRelease, false);
+}
 function bindEvents() {
     body.addEventListener('mousedown', onPress, false);
     body.addEventListener('mouseup', onRelease, false);
@@ -512,6 +561,54 @@ function bindEvents() {
     // resize
     var throttledResize = _.throttle(onResize, 300);
     window.addEventListener('resize', throttledResize, false);
+}
+
+
+// ------------------------------------------------------------------------- //
+// GUI creation
+// ------------------------------------------------------------------------- //
+
+var gui;
+
+function createGUI() {
+
+    var guiContainer = document.getElementById('gui-container');
+
+    gui = new dat.GUI({
+        autoPlace : false
+    });
+    guiContainer.appendChild(gui.domElement);
+    guiContainer.addEventListener('mousedown', function(event){
+        event.stopPropagation();
+    }, false);
+
+    var globals = gui.addFolder('Global Options');
+
+    globals.add(window, 'lineCount', 1, 100);
+    globals.add(window, 'lineLength', 1, 200);
+    globals.add(window, 'tileSize', 20, 300);
+    var mode = globals.add(window, 'mode', ['draw', 'erase']);
+    globals.addColor(window, 'bgColor');
+    globals.open();
+
+    mode.onChange(onModeChange);
+
+
+    var methods = gui.addFolder('Actions');
+
+    methods.add(window, 'drawManyLines');
+    methods.add(window, 'addStroke');
+    methods.add(window, 'clearCanvas');
+    methods.open();
+
+    _.each(strokes, function(stroke, index) {
+        var folder = gui.addFolder('Stroke ' + (index + 1) );
+        folder.add(stroke, 'width', 0, 100);
+        folder.addColor(stroke, 'color');
+        folder.add(stroke, 'cap', ['round', 'square', 'butt']);
+        folder.open();
+    });
+
 }
 
 // ------------------------------------------------------------------------- //
