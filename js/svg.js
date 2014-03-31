@@ -403,41 +403,258 @@ function addStroke() {
 }
 
 // ------------------------------------------------------------------------- //
-// Mode
+// Modes
 // ------------------------------------------------------------------------- //
 
+// starting mode
 var mode = 'draw';
+// modes holder
+var modes = {};
 
-function onModeChange(value) {
+//
+// Draw mode
+//
+modes.draw = (function() {
 
-    var gs = canvas.selectAll('g');
+    function onPressDraw(event) {
+        // normalize
+        normalizeEvent(event);
+        // save X and Y
+        pointerX = event.pageX;
+        pointerY = event.pageY;
 
-    if (value === 'erase') {
-        // consider:
-        // bindDrawEvents();
-        // unbindEraseEvents();
-
-        // unbind normal draw events
-        unbindEvents();
-        gs.forEach(function(group) {
-            // group hover
-            group.hover(onGroupOver, onGroupOut, group, group);
-            group.click(onGroupClick);
+        // make line
+        var line = new Line({
+            x : pointerX,
+            y : pointerY
         });
-    } else {
-        // consider:
-        // bindDrawEvents();
-        // unbindEraseEvents();
+        line.drawPath();
 
-        bindEvents();
-        gs.forEach(function(group) {
-            // unbind listeners
-            group.unhover(onGroupOver, onGroupOut);
-            group.unclick(onGroupClick);
+        // add event listeners for move
+        body.addEventListener('mousemove', onMoveDraw, false);
+
+        // start interval/timeout
+        lineInterval = setInterval(function(){
+            var line = new Line({
+                x : pointerX,
+                y : pointerY
+            });
+            line.drawPath();
+        }, (1000/6) );
+    }
+
+    function onMoveDraw(event) {
+        // save the current X and Y
+        normalizeEvent(event);
+        pointerX = event.pageX;
+        pointerY = event.pageY;
+    }
+
+    function onReleaseDraw(event) {
+        // clear interval
+        clearInterval(lineInterval);
+        // remove move listeners
+        body.removeEventListener('mousemove', onMoveDraw, false);
+    }
+
+    function bindEvents() {
+        body.addEventListener('mousedown', onPressDraw, false);
+        body.addEventListener('mouseup', onReleaseDraw, false);
+    }
+
+    function unbindEvents() {
+        body.removeEventListener('mousedown', onPressDraw, false);
+        body.removeEventListener('mouseup', onReleaseDraw, false);
+    }
+
+    // Return
+    return {
+        on : bindEvents,
+        off : unbindEvents
+    };
+
+})();
+
+//
+// Move mode
+//
+modes.move = (function() {
+
+    // invert filter
+
+
+    function onGroupOverMove() {
+        var invert = canvas.filter( Snap.filter.invert(1) );
+        this.attr({
+            filter : invert
         });
     }
-}
+    function onGroupOutMove() {
+        this.attr({
+            filter : null
+        });
+    }
+    function onGroupPressMove() {
 
+    }
+    function onGroupReleaseMove() {
+
+    }
+    function onPointerMoveMove() {
+
+    }
+
+    function bindEvents() {
+        var gs = canvas.selectAll('g');
+
+        var lastX;
+        var lastY;
+        var currentX;
+        var currentY;
+
+        gs.forEach(function(group) {
+            // group hover
+            group.hover(onGroupOverMove, onGroupOutMove, group, group);
+            group.mousedown(onGroupPressMove);
+
+            group.drag(
+                function move( dx, dy, x, y ){
+                    // set x and y as current
+                    currentX = x;
+                    currentY = y;
+                    // find the change in x, y
+                    var diffX = currentX - lastX;
+                    var diffY = currentY - lastY;
+                    // console.log('dx: ', diffX, 'dy: ', diffY);
+
+                    // make a new matrix
+                    var t = new Snap.Matrix();
+                    // move by the difference in x and y
+                    t.translate(diffX, diffY);
+
+                    // if it had a matrix before, add it to the old
+                    if ( !!this._matrix ) {
+                        t.add(this._matrix);
+                    }
+                    // assign the new matrix value
+                    this._matrix = t;
+                    // make the transformation
+                    this.transform( t );
+
+                    // reset x and y
+                    lastX = currentX;
+                    lastY = currentY;
+                },
+                function start( x, y, event ){
+                    lastX = x;
+                    lastY = y;
+                },
+                function end(event){
+
+                }
+            );
+        });
+    }
+
+    function unbindEvents() {
+        var gs = canvas.selectAll('g');
+
+        gs.forEach(function(group) {
+            // unbind listeners
+            group.unhover(onGroupOverMove, onGroupOutMove);
+            group.unmousedown(onGroupPressMove);
+            group.undrag();
+        });
+    }
+
+    return {
+        on : bindEvents,
+        off : unbindEvents
+    };
+
+})();
+
+//
+// Erase mode
+//
+modes.erase = (function() {
+
+    // invert filter
+    var invert = canvas.filter( Snap.filter.invert(1) );
+
+    function onGroupOverErase() {
+        this.attr({
+            filter : invert
+        });
+    }
+    function onGroupOutErase() {
+        this.attr({
+            filter : null
+        });
+    }
+    function onGroupClickErase() {
+        this.remove();
+    }
+
+
+    function bindEvents() {
+        var gs = canvas.selectAll('g');
+
+        gs.forEach(function(group) {
+            // group hover
+            group.hover(onGroupOverErase, onGroupOutErase, group, group);
+            group.click(onGroupClickErase);
+        });
+    }
+
+    function unbindEvents() {
+        var gs = canvas.selectAll('g');
+
+        gs.forEach(function(group) {
+            // unbind listeners
+            group.unhover(onGroupOverErase, onGroupOutErase);
+            group.unclick(onGroupClickErase);
+        });
+    }
+
+    return {
+        on : bindEvents,
+        off : unbindEvents
+    };
+
+})();
+
+
+
+
+function onModeChange(mode) {
+
+    if (mode === 'draw') {
+        // offs
+        modes.move.off();
+        modes.erase.off();
+        // on
+        modes.draw.on();
+    }
+    else if (mode === 'move') {
+        // offs
+        modes.draw.off();
+        modes.erase.off();
+        // on
+        modes.move.on();
+    }
+    else if (mode === 'erase') {
+        // offs
+        modes.move.off();
+        modes.draw.off();
+        // on
+        modes.erase.on();
+        // might want to do this at the canvas level and delegate for g
+        // so you can DrawManyLines() and still erase without changing modes
+
+    }
+
+}
 
 // ------------------------------------------------------------------------- //
 // Events
@@ -475,88 +692,70 @@ function onResize() {
 }
 
 
-function onClick(event) {
+// function onClick(event) {
 
-    var line = new Line({
-        x : event.x,
-        y : event.y
-    });
+//     var line = new Line({
+//         x : event.x,
+//         y : event.y
+//     });
 
-    line.drawPath();
+//     line.drawPath();
 
-}
+// }
 
 var pointerX;
 var pointerY;
 var lineInterval;
 
-function onPress(event) {
-    // normalize
-    normalizeEvent(event);
-    // save X and Y
-    pointerX = event.pageX;
-    pointerY = event.pageY;
+// function onPress(event) {
+//     // normalize
+//     normalizeEvent(event);
+//     // save X and Y
+//     pointerX = event.pageX;
+//     pointerY = event.pageY;
 
-    // make line
-    var line = new Line({
-        x : pointerX,
-        y : pointerY
-    });
-    line.drawPath();
-    // add event listeners for move
-    body.addEventListener('mousemove', onMove, false);
-    // start interval/timeout
-    lineInterval = setInterval(function(){
-        var line = new Line({
-            x : pointerX,
-            y : pointerY
-        });
-        line.drawPath();
-    }, (1000/6) );
-}
+//     // make line
+//     var line = new Line({
+//         x : pointerX,
+//         y : pointerY
+//     });
+//     line.drawPath();
+//     // add event listeners for move
+//     body.addEventListener('mousemove', onMove, false);
+//     // start interval/timeout
+//     lineInterval = setInterval(function(){
+//         var line = new Line({
+//             x : pointerX,
+//             y : pointerY
+//         });
+//         line.drawPath();
+//     }, (1000/6) );
+// }
 
-function onMove(event) {
-    // save the current X and Y
-    normalizeEvent(event);
-    pointerX = event.pageX;
-    pointerY = event.pageY;
-}
+// function onMove(event) {
+//     // save the current X and Y
+//     normalizeEvent(event);
+//     pointerX = event.pageX;
+//     pointerY = event.pageY;
+// }
 
-function onRelease(event) {
-    // clear interval
-    clearInterval(lineInterval);
-    // remove move listeners
-    body.removeEventListener('mousemove', onMove, false);
-}
+// function onRelease(event) {
+//     // clear interval
+//     clearInterval(lineInterval);
+//     // remove move listeners
+//     body.removeEventListener('mousemove', onMove, false);
+// }
 
-//
-// For groups on erase
-//
-var invert = canvas.filter( Snap.filter.invert(1) );
-
-function onGroupOver() {
-    this.attr({
-        filter : invert
-    });
-}
-function onGroupOut() {
-    this.attr({
-        filter : null
-    });
-}
-function onGroupClick() {
-    this.remove();
-}
 
 
 // binding starting
-function unbindEvents() {
-    body.removeEventListener('mousedown', onPress, false);
-    body.removeEventListener('mouseup', onRelease, false);
-}
+// function unbindEvents() {
+//     body.removeEventListener('mousedown', onPress, false);
+//     body.removeEventListener('mouseup', onRelease, false);
+// }
 function bindEvents() {
-    body.addEventListener('mousedown', onPress, false);
-    body.addEventListener('mouseup', onRelease, false);
+    // body.addEventListener('mousedown', onPress, false);
+    // body.addEventListener('mouseup', onRelease, false);
     // canvas.click(onClick);
     // resize
     var throttledResize = _.throttle(onResize, 300);
@@ -587,7 +786,7 @@ function createGUI() {
     globals.add(window, 'lineCount', 1, 100);
     globals.add(window, 'lineLength', 1, 200);
     globals.add(window, 'tileSize', 20, 300);
-    var mode = globals.add(window, 'mode', ['draw', 'erase']);
+    var mode = globals.add(window, 'mode', ['draw', 'move', 'erase']);
     globals.addColor(window, 'bgColor');
     globals.open();
 
@@ -621,6 +820,7 @@ function init() {
     drawBg();
     // drawManyLines();
     bindEvents();
+    modes.draw.on();
 }
 
 init();
