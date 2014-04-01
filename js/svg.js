@@ -36,7 +36,7 @@ var tilesX = cWidth / tileSize;
 var tilesY = cHeight / tileSize;
 
 // sets the possible moves
-// you can add repeats to increase lik_elYhood of getting something
+// you can add repeats to increase likelyhood of getting something
 var moves = [
     'straight',
     'left',
@@ -424,8 +424,8 @@ modes.draw = (function() {
         // normalize
         normalizeEvent(event);
         // save X and Y
-        pointerX = event._elX;
-        pointerY = event._elY;
+        pointerX = event._canvasX;
+        pointerY = event._canvasY;
 
         // make line
         var line = new Line({
@@ -451,8 +451,8 @@ modes.draw = (function() {
     function onMoveDraw(event) {
         // save the current X and Y
         normalizeEvent(event);
-        pointerX = event._elX;
-        pointerY = event._elY;
+        pointerX = event._canvasX;
+        pointerY = event._canvasY;
         // console.log(event, 'x:', pointerX, 'y:', pointerY);
     }
 
@@ -686,12 +686,12 @@ function normalizeEvent(event) {
         event.pageY = event.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
     }
 
-    // add an _elX and _elY that are relative to the canvas
-    var canvasLeft = event.target.getBoundingClientRect().left;
-    var canvasTop = event.target.getBoundingClientRect().top;
+    // add an _canvasX and _canvasY that are relative to the canvas
+    var canvasLeft = svgWrapper.getBoundingClientRect().left;
+    var canvasTop = svgWrapper.getBoundingClientRect().top;
 
-    event._elX = event.pageX - canvasLeft;
-    event._elY = event.pageY - canvasTop;
+    event._canvasX = event.pageX - canvasLeft;
+    event._canvasY = event.pageY - canvasTop;
 
     return event;
 }
