@@ -1,4 +1,7 @@
 @import 'compass/css3';
+@import 'normalize';
+@import 'fonts';
+@import 'mixins';
 
 // --------------------------------------------------------------------- //
 // Controller
@@ -9,12 +12,38 @@
     width: 300px;
 }
 
+
+
+.button {
+    @include border-radius(3px);
+    border: 0;
+    outline: 0;
+}
+
+.button--group {
+    float: left;
+    @include border-radius(0px);
+}
+.button--group--left {
+    @include border-top-left-radius(3px);
+    @include border-bottom-left-radius(3px);
+}
+.button--group--right {
+    @include border-top-right-radius(3px);
+    @include border-bottom-right-radius(3px);
+}
+// the active button in a group
+.button--group--active {
+background-color: red;
+}
+
 // --------------------------------------------------------------------- //
 // SVG
 // --------------------------------------------------------------------- //
 
 .svg-wrapper {
     overflow: hidden;
+border-left: 1px solid grey;
 }
 
 svg {

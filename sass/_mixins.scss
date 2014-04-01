@@ -1,0 +1,51 @@
+
+// --------------------------------------------------------------------- //
+// Colors
+// --------------------------------------------------------------------- //
+$color-blue: #70DCF9;
+$color-grey: #EDEDED;
+
+
+// --------------------------------------------------------------------- //
+// Helpers
+// --------------------------------------------------------------------- //
+
+// Clearfix
+@mixin clearfix() {
+    &:before,
+    &:after {
+        content: " "; /* 1 */
+        display: table; /* 2 */
+    }
+    &:after {
+        clear: both;
+    }
+    *zoom: 1;
+}
+
+.cf {
+    @include clearfix();
+}
+
+// Image replacement
+.ir,
+%ir {
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    /* IE 6/7 fallback */
+    *text-indent: -9999px;
+
+    &:before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 150%;
+    }
+
+}
+
+@mixin font-smoothing() {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

@@ -21,26 +21,58 @@
 <body>
     <section class="controller">
 
-        <div class="modes">
-            <button class="button button--group button--group--left">Draw</button>
-            <button class="button button--group">Move</button>
-            <button class="button button--group button--group--right">Erase</button>
+        <header>
+            <h1>loopalo</h1>
+        </header>
+
+        <div class="modes cf">
+            <button class="button button--group button--group--left button--group--active" data-mode="draw" id="mode-draw">Draw</button>
+            <button class="button button--group" data-mode="move" id="mode-move">Move</button>
+            <button class="button button--group button--group--right" data-mode="erase" id="mode-erase">Erase</button>
         </div>
 
-        <div class="bg-color">
+        <div class="bg-color-wrapper">
             <label for="">Background Color</label>
-            <input type="number">
+            <input type="text" value="#f3f5df">
         </div>
 
-        <div class="curve-size">
-            <label for="">Curve Size</label>
-            <input type="number">
+        <div class="curve-size-wrapper">
+            <label for="curve-size">Curve Size</label>
+            <input type="number" value="96" id="curve-size">
         </div>
 
-        <div class="line-length">
-            <label for="">Line Length</label>
-            <input type="number">
+        <div class="line-length-wrapper">
+            <label for="line-length">Line Length</label>
+            <input type="number" value="70" id="line-length">
         </div>
+
+        <div class="draw-many-wrapper">
+            <button class="button" id="draw-many">Draw Many</button>
+            <label for="line-count">#</label>
+            <input type="number" id="line-count" value="30">
+        </div>
+
+        <div class="clear-canvas-wrapper">
+            <button class="button" id="clear-canvas">Clear canvas</button>
+        </div>
+
+        <section class="strokes">
+
+            <button class="button add-stroke" id="add-stroke">Add Stroke</button>
+
+            <ul class="strokes__list">
+                <li class="strokes__item">
+                    Stroke
+                </li>
+                <li class="strokes__item">
+                    Stroke
+                </li>
+                <li class="strokes__item">
+                    Stroke
+                </li>
+            </ul>
+
+        </section>
 
 
     </section>
@@ -53,6 +85,7 @@
     </secion>
 </body>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/lib/dat.gui.min.js"></script>
 <script src="js/lib/underscore-min.js"></script>
 <script src="js/lib/snap.svg-min.js"></script>
