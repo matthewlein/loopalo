@@ -288,7 +288,9 @@ Line.prototype.drawPath = function() {
 // Getting stuff
 // ------------------------------------------------------------------------- //
 
-function getTileSizes() {
+// used to set new tile counts on resize and tileSize change
+function setTileSizes() {
+    halfTile = tileSize / 2;
     tilesX = cWidth / tileSize;
     tilesY = cHeight / tileSize;
 }
@@ -345,33 +347,12 @@ function clearCanvas() {
 
 function drawManyLines() {
 
-    // var startX;
-    // var startY;
-    // var startDir;
-    // var tileSize;
-
     var line;
-
-    getTileSizes();
 
     // draw all the lines
     for (var j = 0; j < lineCount; j++) {
 
-        // griddy
-        // startX = ( randomRange(0, tilesX) * tileSize );
-        // startY = ( randomRange(0, tilesY) * tileSize );
-
-        // griddy but kinda random
-        // startX = randomRange(0, cWidth);
-        // startY = randomRange(0, cHeight);
-
-        // startDir = randomRange(0, 3);
-
-        // for random tile sizes
-        // tileSize = randomRange(20, 200);
-
         line = new Line();
-
         line.drawPath();
 
     }
@@ -631,7 +612,16 @@ modes.erase = (function() {
 })();
 
 
+function changeMode(event) {
+    var $this = $(this);
+    var mode = $this.data('mode');
+    var activeClass = 'button--group--active';
 
+    $modeBtns.removeClass(activeClass);
+    $this.addClass(activeClass);
+
+    onModeChange(mode);
+}
 
 function onModeChange(mode) {
 
@@ -700,18 +690,10 @@ function normalizeEvent(event) {
 function onResize() {
     cWidth = svgWrapper.offsetWidth;
     cHeight = svgWrapper.offsetHeight;
-    getTileSizes();
-    // set canvas size
-    // canvas.attr({
-    //     width : cWidth,
-    //     height : cHeight
-    // });
+    setTileSizes();
 }
 
 function bindEventsGlobal() {
-    // body.addEventListener('mousedown', onPress, false);
-    // body.addEventListener('mouseup', onRelease, false);
-    // canvas.click(onClick);
     // resize
     var throttledResize = _.throttle(onResize, 300);
     window.addEventListener('resize', throttledResize, false);
@@ -738,22 +720,21 @@ function createGUI() {
 
     var globals = gui.addFolder('Global Options');
 
-    globals.add(window, 'lineCount', 1, 100);
-    globals.add(window, 'lineLength', 1, 200);
-    globals.add(window, 'tileSize', 20, 300);
-    var mode = globals.add(window, 'mode', ['draw', 'move', 'erase']);
+    // globals.add(window, 'lineCount', 1, 100);
+    // globals.add(window, 'lineLength', 1, 200);
+    // globals.add(window, 'tileSize', 20, 300);
+    // var mode = globals.add(window, 'mode', ['draw', 'move', 'erase']);
     globals.addColor(window, 'bgColor');
     globals.open();
 
-    mode.onChange(onModeChange);
+    // mode.onChange(onModeChange);
 
+    // var methods = gui.addFolder('Actions');
 
-    var methods = gui.addFolder('Actions');
-
-    methods.add(window, 'drawManyLines');
-    methods.add(window, 'addStroke');
-    methods.add(window, 'clearCanvas');
-    methods.open();
+    // methods.add(window, 'drawManyLines');
+    // methods.add(window, 'addStroke');
+    // methods.add(window, 'clearCanvas');
+    // methods.open();
 
     _.each(strokes, function(stroke, index) {
         var folder = gui.addFolder('Stroke ' + (index + 1) );
@@ -764,6 +745,53 @@ function createGUI() {
     });
 
 }
+
+var $modeBtns = $('[data-mode]')
+$modeBtns.on('click', changeMode);
+
+var $curveSizeInput = $('#curve-size');
+$curveSizeInput.on('change', function() {
+    var $this = $(this);
+    var val = $this.val();
+
+    tileSize = Number(val);
+    setTileSizes();
+});
+
+var $lineLengthInput = $('#line-length');
+$lineLengthInput.on('change', function(){
+    var $this = $(this);
+    var val = $this.val();
+
+    lineLength = val;
+});
+
+
+var $drawManyBtn = $('#draw-many');
+$drawManyBtn.on('click', drawManyLines);
+
+var $lineCountInput = $('#line-count');
+$lineCountInput.on('change', function() {
+    var $this = $(this);
+    var val = $this.val();
+
+    lineCount = val;
+});
+
+var $clearCanvasBtn = $('#clear-canvas');
+$clearCanvasBtn.on('click', clearCanvas);
+
+var $addStrokeBtn = $('#add-stroke');
+$addStrokeBtn.on('click', addStroke);
+
+// var $modeDrawBtn = $('#mode-draw');
+// var $modeMoveBtn = $('#mode-move');
+// var $modeEraseBtn = $('#mode-erase');
+
+// $modeDrawBtn.on('click', changeMode);
+// $modeMoveBtn.on('click', changeMode);
+// $modeEraseBtn.on('click', changeMode);
+
 
 // ------------------------------------------------------------------------- //
 // Init
