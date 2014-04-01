@@ -1,3 +1,7 @@
+/* global Modernizr */
+/* global Snap */
+
+
 // ------------------------------------------------------------------------- //
 // Helpers
 // ------------------------------------------------------------------------- //
@@ -12,14 +16,15 @@ function randomRange(low, high) {
 
 var body = window.document.body;
 var canvas = Snap('#svg');
-
-var cWidth = 1200;
-var cHeight = 800;
+var svgWrapper = document.getElementById('svg-wrapper');
 
 canvas.attr({
-    width : cWidth,
-    height : cHeight
+    width : '100%',
+    height : '100%'
 });
+
+var cWidth = svgWrapper.offsetWidth;
+var cHeight = svgWrapper.offsetHeight;
 
 //
 // set up tiles
@@ -31,7 +36,7 @@ var tilesX = cWidth / tileSize;
 var tilesY = cHeight / tileSize;
 
 // sets the possible moves
-// you can add repeats to increase likelyhood of getting something
+// you can add repeats to increase lik_elYhood of getting something
 var moves = [
     'straight',
     'left',
@@ -284,8 +289,6 @@ Line.prototype.drawPath = function() {
 // ------------------------------------------------------------------------- //
 
 function getTileSizes() {
-    halfTile = tileSize / 2;
-
     tilesX = cWidth / tileSize;
     tilesY = cHeight / tileSize;
 }
@@ -394,6 +397,7 @@ function addStroke() {
 
     var newStroke = strokes[newStrokeIndex];
 
+    // gui
     var folder = gui.addFolder('Stroke ' + (strokes.length) );
     folder.add(newStroke, 'width', 0, 100);
     folder.addColor(newStroke, 'color');
@@ -420,8 +424,8 @@ modes.draw = (function() {
         // normalize
         normalizeEvent(event);
         // save X and Y
-        pointerX = event.pageX;
-        pointerY = event.pageY;
+        pointerX = event._elX;
+        pointerY = event._elY;
 
         // make line
         var line = new Line({
@@ -431,7 +435,7 @@ modes.draw = (function() {
         line.drawPath();
 
         // add event listeners for move
-        body.addEventListener('mousemove', onMoveDraw, false);
+        canvas.mousemove(onMoveDraw);
 
         // start interval/timeout
         lineInterval = setInterval(function(){
@@ -440,31 +444,33 @@ modes.draw = (function() {
                 y : pointerY
             });
             line.drawPath();
+            // console.log('x:', pointerX, 'y:', pointerY);
         }, (1000/6) );
     }
 
     function onMoveDraw(event) {
         // save the current X and Y
         normalizeEvent(event);
-        pointerX = event.pageX;
-        pointerY = event.pageY;
+        pointerX = event._elX;
+        pointerY = event._elY;
+        // console.log(event, 'x:', pointerX, 'y:', pointerY);
     }
 
     function onReleaseDraw(event) {
         // clear interval
         clearInterval(lineInterval);
         // remove move listeners
-        body.removeEventListener('mousemove', onMoveDraw, false);
+        canvas.unmousemove(onMoveDraw);
     }
 
     function bindEvents() {
-        body.addEventListener('mousedown', onPressDraw, false);
-        body.addEventListener('mouseup', onReleaseDraw, false);
+        canvas.mousedown(onPressDraw);
+        canvas.mouseup(onReleaseDraw);
     }
 
     function unbindEvents() {
-        body.removeEventListener('mousedown', onPressDraw, false);
-        body.removeEventListener('mouseup', onReleaseDraw, false);
+        canvas.unmousedown(onPressDraw);
+        canvas.unmouseup(onReleaseDraw);
     }
 
     // Return
@@ -660,6 +666,10 @@ function onModeChange(mode) {
 // Events
 // ------------------------------------------------------------------------- //
 
+var pointerX;
+var pointerY;
+var lineInterval;
+
 // yoinked from jQuery
 function normalizeEvent(event) {
     var eventDoc;
@@ -676,84 +686,29 @@ function normalizeEvent(event) {
         event.pageY = event.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
     }
 
+    // add an _elX and _elY that are relative to the canvas
+    var canvasLeft = event.target.getBoundingClientRect().left;
+    var canvasTop = event.target.getBoundingClientRect().top;
+
+    event._elX = event.pageX - canvasLeft;
+    event._elY = event.pageY - canvasTop;
+
     return event;
 }
 
 
 function onResize() {
-    cWidth = window.innerWidth;
-    cHeight = window.innerHeight;
+    cWidth = svgWrapper.offsetWidth;
+    cHeight = svgWrapper.offsetHeight;
     getTileSizes();
     // set canvas size
-    canvas.attr({
-        width : cWidth,
-        height : cHeight
-    });
+    // canvas.attr({
+    //     width : cWidth,
+    //     height : cHeight
+    // });
 }
 
-
-// function onClick(event) {
-
-//     var line = new Line({
-//         x : event.x,
-//         y : event.y
-//     });
-
-//     line.drawPath();
-
-// }
-
-var pointerX;
-var pointerY;
-var lineInterval;
-
-// function onPress(event) {
-//     // normalize
-//     normalizeEvent(event);
-//     // save X and Y
-//     pointerX = event.pageX;
-//     pointerY = event.pageY;
-
-//     // make line
-//     var line = new Line({
-//         x : pointerX,
-//         y : pointerY
-//     });
-//     line.drawPath();
-//     // add event listeners for move
-//     body.addEventListener('mousemove', onMove, false);
-//     // start interval/timeout
-//     lineInterval = setInterval(function(){
-//         var line = new Line({
-//             x : pointerX,
-//             y : pointerY
-//         });
-//         line.drawPath();
-//     }, (1000/6) );
-// }
-
-// function onMove(event) {
-//     // save the current X and Y
-//     normalizeEvent(event);
-//     pointerX = event.pageX;
-//     pointerY = event.pageY;
-// }
-
-// function onRelease(event) {
-//     // clear interval
-//     clearInterval(lineInterval);
-//     // remove move listeners
-//     body.removeEventListener('mousemove', onMove, false);
-// }
-
-
-
-// binding starting
-// function unbindEvents() {
-//     body.removeEventListener('mousedown', onPress, false);
-//     body.removeEventListener('mouseup', onRelease, false);
-// }
-function bindEvents() {
+function bindEventsGlobal() {
     // body.addEventListener('mousedown', onPress, false);
     // body.addEventListener('mouseup', onRelease, false);
     // canvas.click(onClick);
@@ -819,7 +774,7 @@ function init() {
     createGUI();
     drawBg();
     // drawManyLines();
-    bindEvents();
+    bindEventsGlobal();
     modes.draw.on();
 }
 

@@ -19,7 +19,33 @@
 
 </head>
 <body>
-    <div class="svg-wrapper">
+    <section class="controller">
+
+        <div class="modes">
+            <button class="button button--group button--group--left">Draw</button>
+            <button class="button button--group">Move</button>
+            <button class="button button--group button--group--right">Erase</button>
+        </div>
+
+        <div class="bg-color">
+            <label for="">Background Color</label>
+            <input type="number">
+        </div>
+
+        <div class="curve-size">
+            <label for="">Curve Size</label>
+            <input type="number">
+        </div>
+
+        <div class="line-length">
+            <label for="">Line Length</label>
+            <input type="number">
+        </div>
+
+
+    </section>
+
+    <div class="svg-wrapper" id="svg-wrapper">
         <svg id="svg"></svg>
     </div>
     <secion id="gui-container" class="gui-container">
