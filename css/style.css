@@ -471,6 +471,10 @@ body {
   font-size: 16px;
 }
 
+h1 {
+  margin: 0;
+}
+
 .controller {
   float: left;
   width: 300px;
@@ -538,6 +542,10 @@ body {
 
 [type="number"] {
   width: 50px;
+}
+
+.input--color {
+  width: 80px;
 }
 
 .colorpicker-holder {
