@@ -26,14 +26,8 @@ canvas.attr({
 var cWidth = svgWrapper.offsetWidth;
 var cHeight = svgWrapper.offsetHeight;
 
-//
-// set up tiles
-//
-var tileSize = 96;
-var halfTile = tileSize/2;
 
-var tilesX = cWidth / tileSize;
-var tilesY = cHeight / tileSize;
+
 
 // sets the possible moves
 // you can add repeats to increase likelyhood of getting something
@@ -42,6 +36,48 @@ var moves = [
     'left',
     'right'
 ];
+// ------------------------------------------------------------------------- //
+// Default settings
+// ------------------------------------------------------------------------- //
+
+var settings = {
+    // starting mode
+    mode : 'draw',
+    // number of lines drawn
+    lineCount : 30,
+    // how long each line is
+    lineLength : 70,
+    // how big are loops and straights
+    tileSize : 96,
+    // page bg color
+    bgColor : '#F3F5DF',
+    // array of strokes
+    strokes : [
+        {
+            color : '#41abe6',
+            width : 10,
+            cap : 'round'
+        },
+        {
+            color : '#c3d2a0',
+            width : 30,
+            cap : 'round'
+        },
+        {
+            color : '#41abe6',
+            width : 33,
+            cap : 'round'
+        }
+    ]
+};
+
+//
+// set up tiles
+//
+var halfTile = settings.tileSize/2;
+
+var tilesX = cWidth / settings.tileSize;
+var tilesY = cHeight / settings.tileSize;
 
 // ------------------------------------------------------------------------- //
 // Line
@@ -52,15 +88,15 @@ function Line( opts ) {
     opts = opts || {};
 
     // griddy
-    this.x = opts.x || ( randomRange(0, tilesX) * tileSize );
-    this.y = opts.y || ( randomRange(0, tilesY) * tileSize );
+    this.x = opts.x || ( randomRange(0, tilesX) * settings.tileSize );
+    this.y = opts.y || ( randomRange(0, tilesY) * settings.tileSize );
 
     // griddy but kinda random
     // this.x = opts.x || randomRange(0, cWidth);
     // this.y = opt.y || randomRange(0, cHeight);
 
     this.dir = opts.dir || randomRange(0, 3);
-    this.steps = opts.steps || lineLength;
+    this.steps = opts.steps || settings.lineLength;
 
     // start with M move to x, y
     this.pathString = 'M ' + this.x + ' ' + this.y + ' ';
@@ -89,6 +125,8 @@ Line.prototype.advance = function() {
 
     // for rotation direction
     var rotationFlag;
+
+    var tileSize = settings.tileSize;
 
     // the next move
     var nextMove = this.getNextMove();
@@ -250,8 +288,8 @@ Line.prototype.drawPath = function() {
     }
 
     // using a for loop so it draws backwards
-    for (var k = strokes.length - 1; k >= 0; k--) {
-        stroke = strokes[k];
+    for (var k = settings.strokes.length - 1; k >= 0; k--) {
+        stroke = settings.strokes[k];
 
         // if the stroke has a width
         if (!!stroke.width) {
@@ -290,9 +328,9 @@ Line.prototype.drawPath = function() {
 
 // used to set new tile counts on resize and tileSize change
 function setTileSizes() {
-    halfTile = tileSize / 2;
-    tilesX = cWidth / tileSize;
-    tilesY = cHeight / tileSize;
+    halfTile = settings.tileSize / 2;
+    tilesX = cWidth / settings.tileSize;
+    tilesY = cHeight / settings.tileSize;
 }
 
 
@@ -300,32 +338,6 @@ function setTileSizes() {
 // Line drawing
 // ------------------------------------------------------------------------- //
 
-// number of lines drawn
-var lineCount = 30;
-
-// how long each line is
-var lineLength = 70;
-
-// the strokes on the paths
-var strokes = [
-    {
-        color : '#41abe6',
-        width : 10,
-        cap : 'round'
-    },
-    {
-        color : '#c3d2a0',
-        width : 30,
-        cap : 'round'
-    },
-    {
-        color : '#41abe6',
-        width : 33,
-        cap : 'round'
-    }
-];
-
-var bgColor = '#F3F5DF';
 // reference for the rectangle
 var bgRect;
 
@@ -333,7 +345,7 @@ function drawBg() {
     // svg doesn't have a bg color, using rect instead
     bgRect = canvas.rect( 0, 0, '100%', '100%');
     bgRect.attr({
-        fill : bgColor
+        fill : settings.bgColor
     });
 }
 
@@ -350,7 +362,7 @@ function drawManyLines() {
     var line;
 
     // draw all the lines
-    for (var j = 0; j < lineCount; j++) {
+    for (var j = 0; j < settings.lineCount; j++) {
 
         line = new Line();
         line.drawPath();
@@ -362,24 +374,24 @@ function drawManyLines() {
 
 function addStroke() {
 
-    var maxWidthStroke = _.max( strokes, function(stroke) {
+    var maxWidthStroke = _.max( settings.strokes, function(stroke) {
         return stroke.width;
     });
 
     var maxWidth = maxWidthStroke.width;
 
-    var newStrokeIndex = strokes.length;
+    var newStrokeIndex = settingsstrokes.length;
 
-    strokes.push({
+    settings.strokes.push({
         color : '#000',
         width : maxWidth + 5,
         cap : 'round'
     });
 
-    var newStroke = strokes[newStrokeIndex];
+    var newStroke = settings.strokes[newStrokeIndex];
 
     // gui
-    var folder = gui.addFolder('Stroke ' + (strokes.length) );
+    var folder = gui.addFolder('Stroke ' + (settings.strokes.length) );
     folder.add(newStroke, 'width', 0, 100);
     folder.addColor(newStroke, 'color');
     folder.add(newStroke, 'cap', ['round', 'square', 'butt']);
@@ -392,7 +404,7 @@ function addStroke() {
 // ------------------------------------------------------------------------- //
 
 // starting mode
-var mode = 'draw';
+// var mode = 'draw';
 // modes holder
 var modes = {};
 
@@ -615,18 +627,21 @@ modes.erase = (function() {
 })();
 
 
-function changeMode(event) {
+function changeMode() {
     var $this = $(this);
-    var mode = $this.data('mode');
+    var newMode = $this.data('mode');
     var activeClass = 'button--group--active';
 
     $modeBtns.removeClass(activeClass);
     $this.addClass(activeClass);
 
-    onModeChange(mode);
+    settings.mode = newMode;
+    onModeChange();
 }
 
 function onModeChange(mode) {
+
+    var mode = settings.mode;
 
     if (mode === 'draw') {
         // offs
@@ -650,7 +665,6 @@ function onModeChange(mode) {
         modes.erase.on();
         // might want to do this at the canvas level and delegate for g
         // so you can DrawManyLines() and still erase without changing modes
-
     }
 
 }
@@ -720,25 +734,9 @@ function createGUI() {
         event.stopPropagation();
     }, false);
 
-    // var globals = gui.addFolder('Global Options');
 
-    // globals.add(window, 'lineCount', 1, 100);
-    // globals.add(window, 'lineLength', 1, 200);
-    // globals.add(window, 'tileSize', 20, 300);
-    // var mode = globals.add(window, 'mode', ['draw', 'move', 'erase']);
-    // globals.addColor(window, 'bgColor');
-    // globals.open();
 
-    // mode.onChange(onModeChange);
-
-    // var methods = gui.addFolder('Actions');
-
-    // methods.add(window, 'drawManyLines');
-    // methods.add(window, 'addStroke');
-    // methods.add(window, 'clearCanvas');
-    // methods.open();
-
-    _.each(strokes, function(stroke, index) {
+    _.each(settings.strokes, function(stroke, index) {
         var folder = gui.addFolder('Stroke ' + (index + 1) );
         folder.add(stroke, 'width', 0, 100);
         folder.addColor(stroke, 'color');
@@ -748,9 +746,13 @@ function createGUI() {
 
 }
 
+var $modeBtns = $('[data-mode]');
+
 function createController() {
 
-    var $modeBtns = $('[data-mode]');
+    // Maybe move onModeChange into here?
+
+    $modeBtns = $('[data-mode]');
     $modeBtns.on('mousedown', changeMode);
 
     var $curveSizeInput = $('#curve-size');
@@ -758,7 +760,7 @@ function createController() {
         var $this = $(this);
         var val = $this.val();
 
-        tileSize = Number(val);
+        settings.tileSize = Number(val);
         setTileSizes();
     });
 
@@ -767,7 +769,7 @@ function createController() {
         var $this = $(this);
         var val = $this.val();
 
-        lineLength = val;
+        settings.lineLength = val;
     });
 
 
@@ -779,7 +781,7 @@ function createController() {
         var $this = $(this);
         var val = $this.val();
 
-        lineCount = val;
+        settings.lineCount = val;
     });
 
     var $clearCanvasBtn = $('#clear-canvas');
@@ -788,26 +790,34 @@ function createController() {
     var $addStrokeBtn = $('#add-stroke');
     $addStrokeBtn.on('click', addStroke);
 
+    // wrapper for the picker
     var $bgColorPickerHolder = $('#bg-color-colorpicker');
+    // hide it
     $bgColorPickerHolder.hide();
+    // the input
     var $bgColorInput = $('#bg-color');
+    // make the picker widget
     var $bgColorPicker = $.farbtastic( $bgColorPickerHolder, function(color) {
+        // set the bg color and text color (based on how dark it is)
         $bgColorInput.css({
             backgroundColor : color,
             color : this.hsl[2] > 0.5 ? '#000' : '#fff'
         });
+        // set the input value to the color
         $bgColorInput.val(color);
-        bgColor = color;
+        // set the settings bg color to color
+        settings.bgColor = color;
+        // set the bg shape's bg color
         bgRect.attr({
-            fill : bgColor
+            fill : color
         });
     });
-    $bgColorPicker.setColor(bgColor);
+    // set the picker color to the bg color
+    $bgColorPicker.setColor(settings.bgColor);
+    // on focus/blur show and hide
     $bgColorInput.on('focus', function() {
-        console.log('focus');
         $bgColorPickerHolder.show();
     }).on('blur', function() {
-        console.log('unfocus');
         $bgColorPickerHolder.hide();
     });
 
