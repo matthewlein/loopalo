@@ -720,32 +720,6 @@ function bindEventsGlobal() {
 // GUI creation
 // ------------------------------------------------------------------------- //
 
-var gui;
-
-function createGUI() {
-
-    var guiContainer = document.getElementById('gui-container');
-
-    gui = new dat.GUI({
-        autoPlace : false
-    });
-    guiContainer.appendChild(gui.domElement);
-    guiContainer.addEventListener('mousedown', function(event){
-        event.stopPropagation();
-    }, false);
-
-
-
-    _.each(settings.strokes, function(stroke, index) {
-        var folder = gui.addFolder('Stroke ' + (index + 1) );
-        folder.add(stroke, 'width', 0, 100);
-        folder.addColor(stroke, 'color');
-        folder.add(stroke, 'cap', ['round', 'square', 'butt']);
-        folder.open();
-    });
-
-}
-
 var $modeBtns = $('[data-mode]');
 
 function createController() {
@@ -839,7 +813,80 @@ function createController() {
     //     $colorPicker.setColor(bgColor);
 
     // });
+    //
 
+    var strokeTemplate = [
+        '<li class="stroke">',
+            '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
+            '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
+            '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
+                '<option value="round">Round</option>',
+                '<option value="square">Square</option>',
+                '<option value="butt">Butt</option>',
+            '</select>',
+        '</li>'
+    ].join('');
+
+    _.each(settings.strokes, function(stroke, index) {
+
+        var width = stroke.width;
+        var color = stroke.color;
+        var cap = stroke.cap;
+
+        // replace placeholders
+        var strokeHTML = strokeTemplate.replace(new RegExp('{{color}}', 'g' ) , color)
+                                       .replace(new RegExp('{{width}}', 'g' ), width)
+                                       .replace(new RegExp('{{cap}}', 'g' ), cap);
+
+        var $strokeHTML = $(strokeHTML);
+        $strokeHTML.find('option[value="' + cap + '"]').prop('selected', true);
+
+        $strokeHTML.on('change keyup', function(event) {
+
+            var $target = $(event.target);
+            var $this = $(this);
+
+            var width = $this.find('[data-stroke-width]').val();
+            var cap = $this.find('[data-stroke-cap] > :selected').val();
+            var color = $this.find('[data-stroke-color]').val();
+
+            $this.find('[data-stroke-color]').data('strokeColor', color);
+            $this.find('[data-stroke-width]').data('strokeWidth', width);
+            $this.find('[data-stroke-cap]').data('strokeCap', cap);
+
+            rebuildStrokeSettings();
+
+        });
+
+        $('#strokes-list').append($strokeHTML);
+
+    });
+
+}
+
+var $strokeList = $('#strokes-list');
+
+// remakes the strokes array
+function rebuildStrokeSettings() {
+
+    settings.strokes = [];
+
+    $strokeList.children('.stroke').each(function(index) {
+        var $this = $(this);
+        var color = $this.find('[data-stroke-color]').data('strokeColor');
+        var width = $this.find('[data-stroke-width]').data('strokeWidth');
+        var cap = $this.find('[data-stroke-cap]').data('strokeCap');
+
+        // casting
+        width = Number(width);
+
+        settings.strokes[index] = {
+            color : color,
+            width : width,
+            cap : cap
+        };
+
+    });
 
 }
 
@@ -849,7 +896,6 @@ function createController() {
 
 function init() {
     onResize();
-    createGUI();
     drawBg();
     // drawManyLines();
     bindEventsGlobal();
