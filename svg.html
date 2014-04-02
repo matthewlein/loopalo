@@ -25,44 +25,53 @@
             <h1>loopalo</h1>
         </header>
 
-        <div class="modes cf">
+        <div class="modes cf controller__item">
             <button class="button button--group button--group--left button--group--active" data-mode="draw" id="mode-draw">Draw</button>
             <button class="button button--group" data-mode="move" id="mode-move">Move</button>
             <button class="button button--group button--group--right" data-mode="erase" id="mode-erase">Erase</button>
         </div>
 
-        <div class="bg-color-wrapper">
-            <label for="">Background Color</label>
-            <input type="text" value="#f3f5df">
-        </div>
-
-        <div class="curve-size-wrapper">
-            <label for="curve-size">Curve Size</label>
-            <input type="number" value="96" id="curve-size">
-        </div>
-
-        <div class="line-length-wrapper">
-            <label for="line-length">Line Length</label>
-            <input type="number" value="70" id="line-length">
-        </div>
-
-        <div class="draw-many-wrapper">
-            <button class="button" id="draw-many">Draw Many</button>
+        <div class="draw-many-wrapper controller__item">
+            <button class="button button--inline" id="draw-many">Draw Many</button>
             <label for="line-count">#</label>
             <input type="number" id="line-count" value="30">
         </div>
 
-        <div class="clear-canvas-wrapper">
+        <div class="clear-canvas-wrapper controller__item">
             <button class="button" id="clear-canvas">Clear canvas</button>
         </div>
 
-        <section class="strokes">
+        <div class="curve-size-wrapper controller__item">
+            <label for="curve-size">Curve Size</label>
+            <input type="number" value="96" id="curve-size">
+        </div>
+
+        <div class="line-length-wrapper controller__item">
+            <label for="line-length">Line Length</label>
+            <input type="number" value="70" id="line-length">
+        </div>
+
+        <div class="bg-color-wrapper controller__item">
+            <label for="bg-color">Background Color</label>
+            <div id="bg-color-colorpicker" class="colorpicker-holder"></div>
+            <input type="text" value="#f3f5df" id="bg-color">
+        </div>
+
+        <section class="strokes controller__item">
 
             <button class="button add-stroke" id="add-stroke">Add Stroke</button>
 
             <ul class="strokes__list">
-                <li class="strokes__item">
-                    Stroke
+                <li class="stroke">
+
+                    <input type="text" class="stroke-color" value="#41abe6">
+                    <input type="number" class="stroke-width" value="33">
+                    <select name="" id="" class="stroke-cap">
+                        <option value="round">Round</option>
+                        <option value="square">Square</option>
+                        <option value="butt">Butt</option>
+                    </select>
+
                 </li>
                 <li class="strokes__item">
                     Stroke
@@ -87,9 +96,11 @@
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/lib/dat.gui.min.js"></script>
+<script src="js/lib/farbtastic.js"></script>
 <script src="js/lib/underscore-min.js"></script>
 <script src="js/lib/snap.svg-min.js"></script>
-<!-- <script src="js/svg-test.js"></script> -->
+<script src=""></script>
+
 <script src="js/svg.js"></script>
 
 </html>

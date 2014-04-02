@@ -331,7 +331,7 @@ var bgRect;
 
 function drawBg() {
     // svg doesn't have a bg color, using rect instead
-    var bgRect = canvas.rect( 0, 0, '100%', '100%');
+    bgRect = canvas.rect( 0, 0, '100%', '100%');
     bgRect.attr({
         fill : bgColor
     });
@@ -400,6 +400,9 @@ var modes = {};
 // Draw mode
 //
 modes.draw = (function() {
+
+    // draws lines
+    var lineInterval;
 
     function onPressDraw(event) {
         // normalize
@@ -658,7 +661,6 @@ function onModeChange(mode) {
 
 var pointerX;
 var pointerY;
-var lineInterval;
 
 // yoinked from jQuery
 function normalizeEvent(event) {
@@ -718,14 +720,14 @@ function createGUI() {
         event.stopPropagation();
     }, false);
 
-    var globals = gui.addFolder('Global Options');
+    // var globals = gui.addFolder('Global Options');
 
     // globals.add(window, 'lineCount', 1, 100);
     // globals.add(window, 'lineLength', 1, 200);
     // globals.add(window, 'tileSize', 20, 300);
     // var mode = globals.add(window, 'mode', ['draw', 'move', 'erase']);
-    globals.addColor(window, 'bgColor');
-    globals.open();
+    // globals.addColor(window, 'bgColor');
+    // globals.open();
 
     // mode.onChange(onModeChange);
 
@@ -746,52 +748,90 @@ function createGUI() {
 
 }
 
-var $modeBtns = $('[data-mode]')
-$modeBtns.on('click', changeMode);
+function createController() {
 
-var $curveSizeInput = $('#curve-size');
-$curveSizeInput.on('change', function() {
-    var $this = $(this);
-    var val = $this.val();
+    var $modeBtns = $('[data-mode]');
+    $modeBtns.on('mousedown', changeMode);
 
-    tileSize = Number(val);
-    setTileSizes();
-});
+    var $curveSizeInput = $('#curve-size');
+    $curveSizeInput.on('change', function() {
+        var $this = $(this);
+        var val = $this.val();
 
-var $lineLengthInput = $('#line-length');
-$lineLengthInput.on('change', function(){
-    var $this = $(this);
-    var val = $this.val();
+        tileSize = Number(val);
+        setTileSizes();
+    });
 
-    lineLength = val;
-});
+    var $lineLengthInput = $('#line-length');
+    $lineLengthInput.on('change', function() {
+        var $this = $(this);
+        var val = $this.val();
+
+        lineLength = val;
+    });
 
 
-var $drawManyBtn = $('#draw-many');
-$drawManyBtn.on('click', drawManyLines);
+    var $drawManyBtn = $('#draw-many');
+    $drawManyBtn.on('click', drawManyLines);
 
-var $lineCountInput = $('#line-count');
-$lineCountInput.on('change', function() {
-    var $this = $(this);
-    var val = $this.val();
+    var $lineCountInput = $('#line-count');
+    $lineCountInput.on('change', function() {
+        var $this = $(this);
+        var val = $this.val();
 
-    lineCount = val;
-});
+        lineCount = val;
+    });
 
-var $clearCanvasBtn = $('#clear-canvas');
-$clearCanvasBtn.on('click', clearCanvas);
+    var $clearCanvasBtn = $('#clear-canvas');
+    $clearCanvasBtn.on('click', clearCanvas);
 
-var $addStrokeBtn = $('#add-stroke');
-$addStrokeBtn.on('click', addStroke);
+    var $addStrokeBtn = $('#add-stroke');
+    $addStrokeBtn.on('click', addStroke);
 
-// var $modeDrawBtn = $('#mode-draw');
-// var $modeMoveBtn = $('#mode-move');
-// var $modeEraseBtn = $('#mode-erase');
+    var $bgColorPickerHolder = $('#bg-color-colorpicker');
+    $bgColorPickerHolder.hide();
+    var $bgColorInput = $('#bg-color');
+    var $bgColorPicker = $.farbtastic( $bgColorPickerHolder, function(color) {
+        $bgColorInput.css({
+            backgroundColor : color,
+            color : this.hsl[2] > 0.5 ? '#000' : '#fff'
+        });
+        $bgColorInput.val(color);
+        bgColor = color;
+        bgRect.attr({
+            fill : bgColor
+        });
+    });
+    $bgColorPicker.setColor(bgColor);
+    $bgColorInput.on('focus', function() {
+        console.log('focus');
+        $bgColorPickerHolder.show();
+    }).on('blur', function() {
+        console.log('unfocus');
+        $bgColorPickerHolder.hide();
+    });
 
-// $modeDrawBtn.on('click', changeMode);
-// $modeMoveBtn.on('click', changeMode);
-// $modeEraseBtn.on('click', changeMode);
 
+    // var $colorPickers = $('[data-color-picker');
+
+    // $colorPickers.each(function() {
+    //     var $input = $(this);
+
+    //     var $colorPicker = $.farbtastic( $('#bg-color-colorpicker'), function(color) {
+
+    //         $input.css({
+    //             backgroundColor : color,
+    //             color : this.hsl[2] > 0.5 ? '#000' : '#fff'
+    //         });
+    //         $input.val(color);
+    //     })
+
+    //     $colorPicker.setColor(bgColor);
+
+    // });
+
+
+}
 
 // ------------------------------------------------------------------------- //
 // Init
@@ -803,6 +843,7 @@ function init() {
     drawBg();
     // drawManyLines();
     bindEventsGlobal();
+    createController();
     modes.draw.on();
 }
 

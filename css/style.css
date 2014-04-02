@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v2.1.2 | MIT License | git.io/normalize */
 /* ==========================================================================
    HTML5 display definitions
@@ -403,17 +404,100 @@ table {
   height: 150%;
 }
 
+/**
+ * Farbtastic Color Picker 1.2
+ * © 2008 Steven Wittens
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+.farbtastic {
+  position: absolute;
+  bottom: 0;
+  background-color: #fff;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.farbtastic * {
+  position: absolute;
+  cursor: crosshair;
+}
+
+.farbtastic,
+.farbtastic .wheel {
+  width: 195px;
+  height: 195px;
+}
+
+.farbtastic .color, .farbtastic .overlay {
+  top: 47px;
+  left: 47px;
+  width: 101px;
+  height: 101px;
+}
+
+.farbtastic .wheel {
+  background: url("../img/wheel.png") no-repeat;
+  width: 195px;
+  height: 195px;
+}
+
+.farbtastic .overlay {
+  background: url("../img/mask.png") no-repeat;
+}
+
+.farbtastic .marker {
+  width: 17px;
+  height: 17px;
+  margin: -8px 0 0 -8px;
+  overflow: hidden;
+  background: url("../img/marker.png") no-repeat;
+}
+
+body {
+  font-size: 16px;
+}
+
 .controller {
   float: left;
   width: 300px;
+  padding: 20px;
+}
+
+.controller__item {
+  margin-bottom: 20px;
 }
 
 .button {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   border: 0;
   outline: 0;
+  padding: 8px 16px;
+  color: #fff;
+  display: inline-block;
+  vertical-align: middle;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  background: -moz-linear-gradient(#8f8f8f, #5c5c5c);
+  background: -o-linear-gradient(#8f8f8f, #5c5c5c);
+  background: -webkit-linear-gradient(#8f8f8f, #5c5c5c);
+  background: linear-gradient(#8f8f8f, #5c5c5c);
 }
 
 .button--group {
@@ -424,25 +508,40 @@ table {
 }
 
 .button--group--left {
-  -moz-border-radius-topleft: 3px;
-  -webkit-border-top-left-radius: 3px;
-  border-top-left-radius: 3px;
-  -moz-border-radius-bottomleft: 3px;
-  -webkit-border-bottom-left-radius: 3px;
-  border-bottom-left-radius: 3px;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .button--group--right {
-  -moz-border-radius-topright: 3px;
-  -webkit-border-top-right-radius: 3px;
-  border-top-right-radius: 3px;
-  -moz-border-radius-bottomright: 3px;
-  -webkit-border-bottom-right-radius: 3px;
-  border-bottom-right-radius: 3px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  border-top-right-radius: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
+.button:active,
 .button--group--active {
-  background-color: red;
+  color: blue;
+  padding-top: 9px;
+  padding-bottom: 7px;
+  background: -moz-linear-gradient(#5c5c5c, #8f8f8f);
+  background: -o-linear-gradient(#5c5c5c, #8f8f8f);
+  background: -webkit-linear-gradient(#5c5c5c, #8f8f8f);
+  background: linear-gradient(#5c5c5c, #8f8f8f);
+}
+
+[type="number"] {
+  width: 50px;
+}
+
+.colorpicker-holder {
+  position: relative;
 }
 
 .svg-wrapper {
