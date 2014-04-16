@@ -17,10 +17,14 @@ function randomRange(low, high) {
 var body = window.document.body;
 var canvas = Snap('#svg');
 var svgWrapper = document.getElementById('svg-wrapper');
+var $svgWrapper = $(svgWrapper);
 
 canvas.attr({
     width : '100%',
-    height : '100%'
+    height : '100%',
+    // required stuff for saving files
+    version : '1.1',
+    xmlns : 'http://www.w3.org/2000/svg'
 });
 
 var cWidth = svgWrapper.offsetWidth;
@@ -377,36 +381,6 @@ function drawManyLines() {
 }
 
 
-function addStroke() {
-
-    var maxWidthStroke = _.max( settings.strokes, function(stroke) {
-        return stroke.width;
-    });
-
-    var maxWidth = maxWidthStroke.width;
-
-    var newStrokeIndex = settings.strokes.length;
-
-    settings.strokes.push({
-        color : '#000',
-        width : maxWidth + 5,
-        cap : 'round'
-    });
-
-    var newStroke = settings.strokes[newStrokeIndex];
-
-
-    // remake strokes list
-
-    // gui
-    var folder = gui.addFolder('Stroke ' + (settings.strokes.length) );
-    folder.add(newStroke, 'width', 0, 100);
-    folder.addColor(newStroke, 'color');
-    folder.add(newStroke, 'cap', ['round', 'square', 'butt']);
-    folder.open();
-
-}
-
 // ------------------------------------------------------------------------- //
 // Filters
 // ------------------------------------------------------------------------- //
@@ -488,10 +462,19 @@ modes.draw = (function() {
         canvas.unmouseup(onReleaseDraw);
     }
 
+    function on() {
+        bindEvents();
+        $svgWrapper.addClass('mode--draw');
+    }
+    function off() {
+        unbindEvents();
+        $svgWrapper.removeClass('mode--draw');
+    }
+
     // Return
     return {
-        on : bindEvents,
-        off : unbindEvents
+        on : on,
+        off : off
     };
 
 })();
@@ -584,9 +567,18 @@ modes.move = (function() {
         });
     }
 
+    function on() {
+        $svgWrapper.addClass('mode--move');
+        bindEvents();
+    }
+    function off() {
+        $svgWrapper.removeClass('mode--move');
+        unbindEvents();
+    }
+
     return {
-        on : bindEvents,
-        off : unbindEvents
+        on : on,
+        off : off
     };
 
 })();
@@ -631,9 +623,18 @@ modes.erase = (function() {
         });
     }
 
+    function on() {
+        $svgWrapper.addClass('mode--erase');
+        bindEvents();
+    }
+    function off() {
+        $svgWrapper.removeClass('mode--erase');
+        unbindEvents();
+    }
+
     return {
-        on : bindEvents,
-        off : unbindEvents
+        on : on,
+        off : off
     };
 
 })();
@@ -732,10 +733,16 @@ function bindEventsGlobal() {
 // GUI creation
 // ------------------------------------------------------------------------- //
 
-var $modeBtns = $('[data-mode]');
+var $modeBtns;
 
 function createController() {
 
+    var $menu = $('#menu');
+    var $menuBtn = $('#menu-button');
+    $menuBtn.on('click', function() {
+        $menuBtn.toggleClass('button--active');
+        $menu.toggleClass('menu--open');
+    });
     // Maybe move onModeChange into here?
 
     $modeBtns = $('[data-mode]');
@@ -845,85 +852,9 @@ function createController() {
     // Strokes
     //
 
-    var strokeTemplate = [
-        '<li class="stroke">',
-            '<div class="colorpicker-holder" data-color-picker></div>',
-            '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
-            '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
-            '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
-                '<option value="round">Round</option>',
-                '<option value="square">Square</option>',
-                '<option value="butt">Butt</option>',
-            '</select>',
-        '</li>'
-    // join with newline or no??? hmmm
-    ].join('\n');
-
-
     _.each(settings.strokes, function(stroke, index) {
 
-        var width = stroke.width;
-        var color = stroke.color;
-        var cap = stroke.cap;
-
-        // replace placeholders
-        var strokeHTML = strokeTemplate.replace(new RegExp('{{color}}', 'g' ) , color)
-                                       .replace(new RegExp('{{width}}', 'g' ), width)
-                                       .replace(new RegExp('{{cap}}', 'g' ), cap);
-
-        // make the HTML findable
-        var $strokeHTML = $(strokeHTML);
-        // select the correct option
-        $strokeHTML.find('option[value="' + cap + '"]').prop('selected', true);
-
-
-        // wrapper for the picker
-        var $colorPickerHolder = $strokeHTML.find('[data-color-picker]');
-        // hide it
-        $colorPickerHolder.hide();
-        // find the input
-        var $colorInput = $strokeHTML.find('[data-stroke-color]');
-        // make the picker widget
-        var $colorPicker = $.farbtastic( $colorPickerHolder, function(color) {
-            // set the bg color and text color (based on how dark it is)
-            $colorInput.css({
-                backgroundColor : color,
-                color : this.hsl[2] > 0.5 ? '#000' : '#fff'
-            });
-            // set the input value to the color
-            $colorInput.val(color);
-            $colorInput.trigger('change');
-        });
-        // set the picker color to the stroke color
-        $colorPicker.setColor(color);
-        // on focus/blur show and hide
-        $colorInput.on('focus', function() {
-            $colorPickerHolder.show();
-        }).on('blur', function() {
-            $colorPickerHolder.hide();
-        });
-
-        //
-        // Change events update data
-        //
-
-        $strokeHTML.on('change keyup', function(event) {
-
-            var $this = $(this);
-
-            var width = $this.find('[data-stroke-width]').val();
-            var cap = $this.find('[data-stroke-cap] > :selected').val();
-            var color = $this.find('[data-stroke-color]').val();
-
-            $this.find('[data-stroke-color]').data('strokeColor', color);
-            $this.find('[data-stroke-width]').data('strokeWidth', width);
-            $this.find('[data-stroke-cap]').data('strokeCap', cap);
-
-            rebuildStrokeSettings();
-
-        });
-
-        $('#strokes-list').append($strokeHTML);
+        makeStrokeHTML(stroke);
 
     });
 
@@ -952,6 +883,132 @@ function rebuildStrokeSettings() {
         };
 
     });
+}
+
+
+
+var strokeTemplate = [
+    '<li class="stroke">',
+        '<div class="colorpicker-holder" data-color-picker></div>',
+        '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
+        '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
+        '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
+            '<option value="round">Round</option>',
+            '<option value="square">Square</option>',
+            '<option value="butt">Butt</option>',
+        '</select>',
+    '</li>'
+// join with newline or no??? hmmm
+].join('\n');
+
+function addStroke() {
+
+    var maxWidthStroke = _.max( settings.strokes, function(stroke) {
+        return stroke.width;
+    });
+
+    var maxWidth = maxWidthStroke.width;
+
+    var newStrokeIndex = settings.strokes.length;
+
+    settings.strokes.push({
+        color : '#000000',
+        width : maxWidth + 5,
+        cap : 'round'
+    });
+
+    var newStroke = settings.strokes[newStrokeIndex];
+
+    makeStrokeHTML(newStroke);
+
+}
+
+function makeStrokeHTML(stroke) {
+
+    var width = stroke.width;
+    var color = stroke.color;
+    var cap = stroke.cap;
+
+    // replace placeholders
+    var strokeHTML = strokeTemplate.replace(new RegExp('{{color}}', 'g' ) , color)
+                                   .replace(new RegExp('{{width}}', 'g' ), width)
+                                   .replace(new RegExp('{{cap}}', 'g' ), cap);
+
+    // make the HTML findable
+    var $strokeHTML = $(strokeHTML);
+    // select the correct option
+    $strokeHTML.find('option[value="' + cap + '"]').prop('selected', true);
+
+
+    // wrapper for the picker
+    var $colorPickerHolder = $strokeHTML.find('[data-color-picker]');
+    // hide it
+    $colorPickerHolder.hide();
+    // find the input
+    var $colorInput = $strokeHTML.find('[data-stroke-color]');
+    // make the picker widget
+    var $colorPicker = $.farbtastic( $colorPickerHolder, function(color) {
+        // set the bg color and text color (based on how dark it is)
+        $colorInput.css({
+            backgroundColor : color,
+            color : this.hsl[2] > 0.5 ? '#000' : '#fff'
+        });
+        // set the input value to the color
+        $colorInput.val(color);
+        $colorInput.trigger('change');
+    });
+    // set the picker color to the stroke color
+    $colorPicker.setColor(color);
+    // on focus/blur show and hide
+    $colorInput.on('focus', function() {
+        $colorPickerHolder.show();
+    }).on('blur', function() {
+        $colorPickerHolder.hide();
+    });
+
+    //
+    // Change events update data
+    //
+
+    $strokeHTML.on('change keyup', function(event) {
+
+        var $this = $(this);
+
+        var width = $this.find('[data-stroke-width]').val();
+        var cap = $this.find('[data-stroke-cap] > :selected').val();
+        var color = $this.find('[data-stroke-color]').val();
+
+        $this.find('[data-stroke-color]').data('strokeColor', color);
+        $this.find('[data-stroke-width]').data('strokeWidth', width);
+        $this.find('[data-stroke-cap]').data('strokeCap', cap);
+
+        rebuildStrokeSettings();
+
+    });
+
+    $('#strokes-list').append($strokeHTML);
+}
+
+//
+// Menu
+//
+
+function createMenu() {
+    var $saveBtn = $('#save-button');
+    $saveBtn.on( 'click', saveSVG );
+}
+
+function saveSVG() {
+
+    var SVGstring = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + (new XMLSerializer).serializeToString(canvas.node);
+
+    // uses FileSaver script
+    saveAs(
+        new Blob(
+            [SVGstring],
+            {type: 'image/svg+xml;charset=' + document.characterSet}
+        ), 'loopalo' + Date.now() + '.svg'
+    );
 
 }
 
@@ -965,6 +1022,7 @@ function init() {
     // drawManyLines();
     bindEventsGlobal();
     createController();
+    createMenu();
     modes.draw.on();
 }
 

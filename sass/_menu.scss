@@ -1,0 +1,13 @@
+.menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: #444;
+    width: 75%;
+    padding: 20px;
+    z-index: 100;
+    @include transition(all 300ms $easeOutQuad);
+}
+.menu--open {
+    right: -75%;
+}

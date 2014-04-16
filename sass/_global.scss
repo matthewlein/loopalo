@@ -1,0 +1,82 @@
+
+// --------------------------------------------------------------------- //
+// Globals
+// --------------------------------------------------------------------- //
+
+body {
+    font-size: 16px;
+    background-color: #ccc;
+    margin: 0;
+    height: 100%;
+}
+html {
+    height: 100%;
+}
+
+h1 {
+    margin: 0;
+}
+ul,
+li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+*,
+*:before,
+*:after {
+    @include box-sizing(border-box);
+}
+
+
+
+// --------------------------------------------------------------------- //
+// SVG
+// --------------------------------------------------------------------- //
+
+.svg-wrapper {
+    overflow: hidden;
+border-left: 1px solid grey;
+}
+
+svg {
+    display: block;
+    // cursor: pointer;
+}
+
+
+svg path {
+    stroke-dashoffset: 0;
+    // @include animation(dash 5s linear);
+    // @include animation-fill-mode(forwards);
+    @include transition(stroke-dashoffset 5s linear);
+}
+
+.mode--draw {
+    cursor: crosshair;
+}
+.mode--move g {
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor:    -moz-grab;
+    cursor:         grab;
+}
+.mode--move g:active {
+    cursor: move;
+    cursor: -webkit-grabbing;
+    cursor:    -moz-grabbing;
+    cursor:         grabbing;
+}
+.mode--erase {
+    cursor: pointer;
+}
+
+@include keyframes(dash) {
+    from {
+        stroke-dashoffset: 6000;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+};

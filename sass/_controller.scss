@@ -1,0 +1,115 @@
+// --------------------------------------------------------------------- //
+// Controller
+// --------------------------------------------------------------------- //
+
+// for dat.GUI
+// .gui-container {
+//     position: absolute;
+//     right: 0;
+//     top: 0;
+// }
+
+.controller-wrapper {
+    float: left;
+    width: 300px;
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+
+.controller {
+    padding: 20px;
+    position: relative;
+    z-index: 200;
+    background-color: #ccc;
+}
+
+.controller__header {
+    position: relative;
+    margin-bottom: 20px;
+}
+.logo {
+    float: left;
+}
+.button--menu {
+    float: right;
+}
+
+.controller__item {
+    margin-bottom: 20px;
+}
+
+//
+// Buttons
+//
+$button-radius: 5px;
+.button {
+    border: 0;
+    outline: 0;
+    padding: 8px 16px;
+    color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    @include border-radius($button-radius);
+    @include box-shadow( 0 0 2px rgba( 0, 0, 0, 0.2 ) );
+    @include background(
+        linear-gradient( rgba(143,143,143,1), rgba(92,92,92,1) )
+    );
+}
+
+.button--group {
+    float: left;
+    @include border-radius(0px);
+}
+.button--group--left {
+    @include border-top-left-radius($button-radius);
+    @include border-bottom-left-radius($button-radius);
+}
+.button--group--right {
+    @include border-top-right-radius($button-radius);
+    @include border-bottom-right-radius($button-radius);
+}
+// the active button in a group
+.button:active,
+.button--active,
+.button--group--active {
+    padding-top: 9px;
+    padding-bottom: 7px;
+    color: #4469FF;
+    text-shadow: 0 0 4px rgba( 165, 235, 76, 0.75 );
+    @include background(
+        linear-gradient( rgba(92,92,92,1), rgba(143,143,143,1) )
+    );
+}
+
+.button--full {
+    width: 100%;
+}
+
+.button--inline {
+
+}
+
+
+
+//
+// Inputs
+//
+[type="number"] {
+    width: 50px;
+}
+.input--color {
+    width: 80px;
+}
+
+.colorpicker-holder {
+    position: relative;
+}
+
+//
+// Strokes
+//
+
+.stroke {
+    padding: 0.5em 0;
+}
