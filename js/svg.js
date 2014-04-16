@@ -58,11 +58,11 @@ var settings = {
     // starting mode
     mode : 'draw',
     // number of lines drawn
-    lineCount : 30,
+    lineCount : 130,
     // how long each line is
-    lineLength : 70,
+    lineLength : 170,
     // how big are loops and straights
-    tileSize : 96,
+    tileSize : 196,
     // line opacity
     opacity : 1,
     // page bg color
@@ -887,7 +887,6 @@ function createController() {
     });
 
 
-
     // make strokes
     _.each(settings.strokes, function(stroke, index) {
         makeStrokeHTML(stroke);
@@ -937,6 +936,7 @@ var strokeTemplate = [
             '<option value="square">Square</option>',
             '<option value="butt">Butt</option>',
         '</select>',
+        '<button class="stroke-delete" data-stroke-delete>x</button>',
     '</li>'
 // join with newline or no??? hmmm
 ].join('\n');
@@ -1004,6 +1004,13 @@ function makeStrokeHTML(stroke) {
         $colorPickerHolder.show();
     }).on('blur', function() {
         $colorPickerHolder.hide();
+    });
+
+    // delete button
+    var $deleteStroke = $strokeHTML.find('[data-stroke-delete]');
+    $deleteStroke.on('click', function() {
+        $strokeHTML.remove();
+        rebuildStrokeSettings();
     });
 
     //
