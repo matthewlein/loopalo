@@ -4,67 +4,110 @@
     <meta charset="UTF-8">
     <title>Document</title>
 
+    <link rel="stylesheet" href="css/style.css">
+
     <style>
 
     body {
-        width: 720px;
-        margin: auto;
-        position: relative;
-    }
-
-    .stage {
-        position: absolute;
-        left: 0;
-        top: 0;
-    }
-
-    .tile {
-        width: 72px;
-        height: 72px;
-        background-image: url('tile.png');
-        float: left;
+        background-color: #ccc;
+        margin: 0;
     }
 
     </style>
 
+    <script src="js/lib/modernizr.js"></script>
+
 </head>
 <body>
+    <section class="controller">
 
+        <header>
+            <h1>loopalo</h1>
+        </header>
+
+        <div class="modes cf controller__item">
+            <button class="button button--group button--group--left button--group--active" data-mode="draw" id="mode-draw">Draw</button>
+            <button class="button button--group" data-mode="move" id="mode-move">Move</button>
+            <button class="button button--group button--group--right" data-mode="erase" id="mode-erase">Erase</button>
+        </div>
+
+        <div class="draw-many-wrapper controller__item">
+            <button class="button button--inline" id="draw-many">Draw Many</button>
+            <label for="line-count">#</label>
+            <input type="number" id="line-count" value="30">
+        </div>
+
+        <div class="clear-canvas-wrapper controller__item">
+            <button class="button" id="clear-canvas">Clear canvas</button>
+        </div>
+
+        <div class="curve-size-wrapper controller__item">
+            <label for="curve-size">Curve Size</label>
+            <input type="number" value="96" id="curve-size">
+        </div>
+
+        <div class="line-length-wrapper controller__item">
+            <label for="line-length">Line Length</label>
+            <input type="number" value="70" id="line-length">
+        </div>
+
+        <div class="line-opacity-wrapper controller__item">
+            <label for="line-opacity">Opacity</label>
+            <input type="range" value="1" step="0.01" min="0" max="1" id="line-opacity">
+        </div>
+
+        <div class="bg-color-wrapper controller__item">
+            <label for="bg-color">Background Color</label>
+            <div id="bg-color-colorpicker" class="colorpicker-holder"></div>
+            <input type="text" value="#f3f5df" id="bg-color" class="input--color">
+        </div>
+
+        <section class="strokes controller__item">
+
+            <button class="button add-stroke" id="add-stroke">Add Stroke</button>
+
+            <ul class="strokes__list" id="strokes-list">
+
+                <!--
+                <li class="stroke">
+                    <input type="text" class="stroke-color input--color" value="#41abe6" data-stroke-color="#41abe6">
+                    <input type="number" class="stroke-width" value="10" data-stroke-width="10">
+                    <select name="" id="" class="stroke-cap" data-stroke-cap="round">
+                        <option value="round">Round</option>
+                        <option value="square">Square</option>
+                        <option value="butt">Butt</option>
+                    </select>
+                </li>
+                -->
+
+            </ul>
+
+            <h2>Todo:</h2>
+            <ul>
+                <li>fix numbers going negative</li>
+                <li>fix numbers not allowing typing or deleting</li>
+                <li>add stroke</li>
+            </ul>
+
+        </section>
+
+
+    </section>
+
+    <div class="svg-wrapper" id="svg-wrapper">
+        <svg id="svg"></svg>
+    </div>
+    <secion id="gui-container" class="gui-container">
+
+    </secion>
 </body>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="js/lib/farbtastic.js"></script>
+<script src="js/lib/underscore-min.js"></script>
+<script src="js/lib/snap.svg-min.js"></script>
+<script src="js/lib/FileSaver.js"></script>
 
-<script>
-
-
-// random range
-function randomRange(low, high) {
-    return Math.floor( Math.random() * (1 + high - low) ) + low;
-}
-
-for (var i = 0; i < 15; i++) {
-
-    var $stage = $('<div class="stage"></div>')
-
-    for (var j = 0; j < 100; j++) {
-
-        $stage.append('<div class="tile"/>');
-
-    };
-
-    $('body').append($stage);
-
-};
-
-$('.tile').each(function(index) {
-
-    var rotation = randomRange(1,4);
-
-    $(this).css({
-        transform: 'rotate(' + (rotation * 90) + 'deg)'
-    })
-});
-
-</script>
+<script src="js/svg.js"></script>
 
 </html>
