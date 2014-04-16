@@ -49,6 +49,8 @@ var settings = {
     lineLength : 70,
     // how big are loops and straights
     tileSize : 96,
+    // line opacity
+    opacity : 1,
     // page bg color
     bgColor : '#F3F5DF',
     // array of strokes
@@ -318,6 +320,9 @@ Line.prototype.drawPath = function() {
         }
     }
 
+    // set opacity on group so it works right
+    this.group.attr('opacity', settings.opacity);
+
 };
 
 
@@ -380,7 +385,7 @@ function addStroke() {
 
     var maxWidth = maxWidthStroke.width;
 
-    var newStrokeIndex = settingsstrokes.length;
+    var newStrokeIndex = settings.strokes.length;
 
     settings.strokes.push({
         color : '#000',
@@ -390,6 +395,9 @@ function addStroke() {
 
     var newStroke = settings.strokes[newStrokeIndex];
 
+
+    // remake strokes list
+
     // gui
     var folder = gui.addFolder('Stroke ' + (settings.strokes.length) );
     folder.add(newStroke, 'width', 0, 100);
@@ -398,6 +406,17 @@ function addStroke() {
     folder.open();
 
 }
+
+// ------------------------------------------------------------------------- //
+// Filters
+// ------------------------------------------------------------------------- //
+
+var filters = {
+    // invert filter
+    invert : canvas.filter( Snap.filter.invert(1) )
+};
+// set to object bounding box for no clipping
+filters.invert.attr('filterUnits' , 'objectBoundingBox' );
 
 // ------------------------------------------------------------------------- //
 // Modes
@@ -482,13 +501,9 @@ modes.draw = (function() {
 //
 modes.move = (function() {
 
-    // invert filter
-
-
     function onGroupOverMove() {
-        var invert = canvas.filter( Snap.filter.invert(1) );
         this.attr({
-            filter : invert
+            filter : filters.invert
         });
     }
     function onGroupOutMove() {
@@ -581,12 +596,9 @@ modes.move = (function() {
 //
 modes.erase = (function() {
 
-    // invert filter
-    var invert = canvas.filter( Snap.filter.invert(1) );
-
     function onGroupOverErase() {
         this.attr({
-            filter : invert
+            filter : filters.invert
         });
     }
     function onGroupOutErase() {
@@ -764,6 +776,39 @@ function createController() {
     var $addStrokeBtn = $('#add-stroke');
     $addStrokeBtn.on('click', addStroke);
 
+    $('.controller').on('keydown','input[type="number"]', function(event) {
+
+        event.preventDefault();
+
+        var $this = $(this);
+
+        var key = event.which;
+        // shift key jump by 10
+        var step = this.step || 1;
+        var increment = event.shiftKey ? ( step * 10 ) : step;
+
+        if (key === 38 || key === 40) {
+            //up
+            increment = (key === 38) ? increment : -(increment);
+            var num = Number( $this.val() ) + increment;
+            $this.val( num ).trigger('change');
+        }
+
+    });
+
+    var $opacityInput = $('#line-opacity');
+    $opacityInput.on('input change', function(event) {
+        var $this = $(this);
+        var val = $this.val();
+
+        settings.opacity = val;
+    });
+
+
+    //
+    // Color Pickers
+    //
+
     // wrapper for the picker
     var $bgColorPickerHolder = $('#bg-color-colorpicker');
     // hide it
@@ -796,27 +841,13 @@ function createController() {
     });
 
 
-    // var $colorPickers = $('[data-color-picker');
-
-    // $colorPickers.each(function() {
-    //     var $input = $(this);
-
-    //     var $colorPicker = $.farbtastic( $('#bg-color-colorpicker'), function(color) {
-
-    //         $input.css({
-    //             backgroundColor : color,
-    //             color : this.hsl[2] > 0.5 ? '#000' : '#fff'
-    //         });
-    //         $input.val(color);
-    //     })
-
-    //     $colorPicker.setColor(bgColor);
-
-    // });
+    //
+    // Strokes
     //
 
     var strokeTemplate = [
         '<li class="stroke">',
+            '<div class="colorpicker-holder" data-color-picker></div>',
             '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
             '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
             '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
@@ -825,7 +856,9 @@ function createController() {
                 '<option value="butt">Butt</option>',
             '</select>',
         '</li>'
-    ].join('');
+    // join with newline or no??? hmmm
+    ].join('\n');
+
 
     _.each(settings.strokes, function(stroke, index) {
 
@@ -838,12 +871,44 @@ function createController() {
                                        .replace(new RegExp('{{width}}', 'g' ), width)
                                        .replace(new RegExp('{{cap}}', 'g' ), cap);
 
+        // make the HTML findable
         var $strokeHTML = $(strokeHTML);
+        // select the correct option
         $strokeHTML.find('option[value="' + cap + '"]').prop('selected', true);
+
+
+        // wrapper for the picker
+        var $colorPickerHolder = $strokeHTML.find('[data-color-picker]');
+        // hide it
+        $colorPickerHolder.hide();
+        // find the input
+        var $colorInput = $strokeHTML.find('[data-stroke-color]');
+        // make the picker widget
+        var $colorPicker = $.farbtastic( $colorPickerHolder, function(color) {
+            // set the bg color and text color (based on how dark it is)
+            $colorInput.css({
+                backgroundColor : color,
+                color : this.hsl[2] > 0.5 ? '#000' : '#fff'
+            });
+            // set the input value to the color
+            $colorInput.val(color);
+            $colorInput.trigger('change');
+        });
+        // set the picker color to the stroke color
+        $colorPicker.setColor(color);
+        // on focus/blur show and hide
+        $colorInput.on('focus', function() {
+            $colorPickerHolder.show();
+        }).on('blur', function() {
+            $colorPickerHolder.hide();
+        });
+
+        //
+        // Change events update data
+        //
 
         $strokeHTML.on('change keyup', function(event) {
 
-            var $target = $(event.target);
             var $this = $(this);
 
             var width = $this.find('[data-stroke-width]').val();
