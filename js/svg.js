@@ -10,6 +10,16 @@ function randomRange(low, high) {
     return Math.floor( Math.random() * (1 + high - low) ) + low;
 }
 
+function invertColor(color) {
+
+    var RGB = Snap.getRGB(color);
+
+    var invertRGB = 'rgb(' + (255 - RGB.r) + ',' + (255 - RGB.g) + ',' + (255 - RGB.b) + ')';
+
+    return invertRGB;
+
+}
+
 // ------------------------------------------------------------------------- //
 // App vars
 // ------------------------------------------------------------------------- //
@@ -315,6 +325,10 @@ Line.prototype.drawPath = function() {
                 fill : 'none'
             });
 
+            // store for inverting
+            this.path._color = stroke.color;
+            this.path._colorInvert = invertColor(stroke.color);
+
             pathSpeed = pathLength / drawSpeed;
 
             animatePath(this.path, pathSpeed);
@@ -390,7 +404,14 @@ var filters = {
     invert : canvas.filter( Snap.filter.invert(1) )
 };
 // set to object bounding box for no clipping
-filters.invert.attr('filterUnits' , 'objectBoundingBox' );
+// huge sizes are the only way to know if it will work
+filters.invert.attr({
+    filterUnits : 'objectBoundingBox',
+    x : '-300%',
+    y : '-300%',
+    width : '600%',
+    height : '600%'
+});
 
 // ------------------------------------------------------------------------- //
 // Modes
@@ -485,13 +506,20 @@ modes.draw = (function() {
 modes.move = (function() {
 
     function onGroupOverMove() {
-        this.attr({
-            filter : filters.invert
+
+        var paths = this.selectAll('path');
+
+        $.each(paths, function(index, path) {
+            path.attr( 'stroke', path._colorInvert );
         });
+
     }
     function onGroupOutMove() {
-        this.attr({
-            filter : null
+
+        var paths = this.selectAll('path');
+
+        $.each(paths, function(index, path) {
+            path.attr( 'stroke', path._color );
         });
     }
     function onGroupPressMove() {
@@ -589,13 +617,17 @@ modes.move = (function() {
 modes.erase = (function() {
 
     function onGroupOverErase() {
-        this.attr({
-            filter : filters.invert
+        var paths = this.selectAll('path');
+
+        $.each(paths, function(index, path) {
+            path.attr( 'stroke', path._colorInvert );
         });
     }
     function onGroupOutErase() {
-        this.attr({
-            filter : null
+        var paths = this.selectAll('path');
+
+        $.each(paths, function(index, path) {
+            path.attr( 'stroke', path._color );
         });
     }
     function onGroupClickErase() {
@@ -785,8 +817,6 @@ function createController() {
 
     $('.controller').on('keydown','input[type="number"]', function(event) {
 
-        event.preventDefault();
-
         var $this = $(this);
 
         var key = event.which;
@@ -795,11 +825,20 @@ function createController() {
         var increment = event.shiftKey ? ( step * 10 ) : step;
 
         if (key === 38 || key === 40) {
-            //up
+            // only prevent on these keys
+            event.preventDefault();
+            // if key is up, positive, otherwise its down and go negative
             increment = (key === 38) ? increment : -(increment);
             var num = Number( $this.val() ) + increment;
-            $this.val( num ).trigger('change');
+            // make sure its not below 0
+            if (num < 0) {
+                num = 0;
+            }
+            $this.val( num );
         }
+
+        // trigger change to update settings
+        $this.trigger('change');
 
     });
 
@@ -848,17 +887,18 @@ function createController() {
     });
 
 
-    //
-    // Strokes
-    //
 
+    // make strokes
     _.each(settings.strokes, function(stroke, index) {
-
         makeStrokeHTML(stroke);
-
     });
 
 }
+
+
+//
+// Strokes
+//
 
 var $strokeList = $('#strokes-list');
 

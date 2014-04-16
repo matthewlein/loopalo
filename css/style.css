@@ -568,13 +568,14 @@ svg path {
   width: 300px;
   position: relative;
   height: 100%;
-  overflow: auto;
 }
 
 .controller {
   padding: 20px;
   position: relative;
   z-index: 200;
+  height: 100%;
+  overflow: auto;
   background-color: #ccc;
 }
 
