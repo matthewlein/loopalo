@@ -339,7 +339,9 @@ Line.prototype.drawPath = function() {
     }
 
     // set opacity on group so it works right
-    this.group.attr('opacity', (settings.opacity/100) );
+    if ( settings.opacity < 100 ) {
+        this.group.attr('opacity', (settings.opacity/100) );
+    }
 
 };
 
