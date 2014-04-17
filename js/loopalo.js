@@ -769,7 +769,7 @@ function bindEventsGlobal() {
 
 var $modeBtns;
 
-function createController() {
+function controller() {
 
     // menu button
     var $menu = $('#menu');
@@ -825,13 +825,13 @@ function createController() {
     var $opacityInput = $('#line-opacity-input');
     $opacityRange.val(settings.opacity);
     $opacityInput.val(settings.opacity);
-    $opacityRange.on('input change', function(event) {
+    $opacityRange.on('input change', function() {
         var $this = $(this);
         var val = $this.val();
         $opacityInput.val(val);
         settings.opacity = val;
     });
-    $opacityInput.on('change', function(event) {
+    $opacityInput.on('change', function() {
         var $this = $(this);
         var val = $this.val();
         $opacityRange.val(val);
@@ -1041,8 +1041,10 @@ function makeStrokeHTML(stroke) {
     // delete button
     var $deleteStroke = $strokeHTML.find('[data-stroke-delete]');
     $deleteStroke.on('click', function() {
-        $strokeHTML.remove();
-        rebuildStrokeSettings();
+        if ( $('#strokes-list').children().length > 1 ) {
+            $strokeHTML.remove();
+            rebuildStrokeSettings();
+        }
     });
 
     //
@@ -1068,16 +1070,124 @@ function makeStrokeHTML(stroke) {
     $('#strokes-list').append($strokeHTML);
 }
 
+
+function changeSettings() {
+
+
+
+}
+
 //
 // Menu
 //
 
-function createMenu() {
-    var $saveBtn = $('#save-button');
-    $saveBtn.on( 'click', saveSVG );
+function menu() {
+
+    var $exportBtn = $('#export-button');
+    $exportBtn.on( 'click', exportSVG );
+
+    // stores the saved
+    var savedSettings = [];
+    var $savedSettingsUI = $('#settings-list');
+    // stored index of currently selected item
+    var selectedIndex;
+
+    //
+    // Setup
+    //
+    function getSavedSettings() {
+        localforage.getItem('savedSettings', function(data) {
+            if (!!data) {
+                savedSettings = data;
+            }
+            buildSettingsUI();
+        });
+    }
+    function buildSettingsUI() {
+        $.each(savedSettings, function(index, item) {
+            var $li = $('<li class="settings-list__item">' + item.name + '</li>');
+            $li.data('name', item.name);
+            $li.data('settings', item.settings);
+            $savedSettingsUI.append($li);
+        });
+        $savedSettingsUI.on('click', 'li', function() {
+            var $this = $(this);
+
+            // deal with classes
+            var selectedClass = 'settings-list__item--active';
+            $this.siblings().removeClass(selectedClass);
+            $this.addClass(selectedClass);
+
+            // set index
+            selectedIndex = $this.index();
+        });
+    }
+    getSavedSettings();
+
+
+    //
+    // Save
+    //
+    var $saveSettingsBtn = $('#save-settings');
+    $saveSettingsBtn.on('click', saveSettings);
+
+    function saveSettings() {
+
+        var name = prompt('Name:');
+
+        savedSettings.push({
+            name : name,
+            settings : settings
+        });
+        localforage.setItem('savedSettings', savedSettings, function(){
+            var $li = $('<li class="settings-list__item">' + name + '</li>');
+            $li.data('name', name);
+            $li.data('settings', settings);
+            $savedSettingsUI.append($li);
+        });
+    }
+
+    //
+    // Load
+    //
+    var $loadSettingsBtn = $('#load-settings');
+    $loadSettingsBtn.on('click', loadSettings);
+
+    function loadSettings() {
+
+        // set appropriate index from UI list
+
+        // get from storage
+        localforage.getItem('savedSettings', function(data) {
+
+            // remove active class
+            $savedSettingsUI.children().removeClass('settings-list__item--active');
+            // change settings from index
+            console.log(data[selectedIndex]);
+            selectedIndex = null;
+        });
+    }
+
+    //
+    // Clear
+    //
+    var $clearSettingsBtn = $('#clear-settings');
+    $clearSettingsBtn.on('click', clearSettings);
+
+    function clearSettings() {
+        localforage.setItem('savedSettings', null, function() {
+            // remove UI list
+            $savedSettingsUI.children().remove();
+            // nothing is selected
+            selectedIndex = null;
+            // settings list is empty
+            savedSettings = [];
+        })
+    }
+
 }
 
-function saveSVG() {
+function exportSVG() {
 
     var SVGstring = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + (new XMLSerializer).serializeToString(canvas.node);
 
@@ -1088,7 +1198,6 @@ function saveSVG() {
             {type: 'image/svg+xml;charset=' + document.characterSet}
         ), 'loopalo' + Date.now() + '.svg'
     );
-
 }
 
 // ------------------------------------------------------------------------- //
@@ -1100,8 +1209,8 @@ function init() {
     drawBg();
     // drawManyLines();
     bindEventsGlobal();
-    createController();
-    createMenu();
+    controller();
+    menu();
     modes.draw.on();
 }
 

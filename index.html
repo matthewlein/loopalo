@@ -84,27 +84,35 @@
             <h2>Todo:</h2>
             <ul>
                 <li>design</li>
-                <li>save settings to localForage</li>
-                <li>load settings from localForage</li>
-                <li>random/inspire mode</li>
-                <li>juice it</li>
+                <li>refactor</li>
+                <li>load settings</li>
+                <li>disable draw many on move, erase modes</li>
+                <li>disable load settings if nothing selected</li>
+                <li>reorder strokes</li>
                 <li>hide/show stroke</li>
+                <li>juice up effects/transitions</li>
+                <li>random/inspire mode</li>
             </ul>
 
         </section>
 
         <section class="menu" id="menu">
             <nav>
-                <ul>
-                    <li>
-                        <button class="button button--save button--full" id="save-button">Export SVG</button>
+                <ul class="menu__list">
+                    <li class="menu__item">
+                        <button class="button button--export button--full" id="export-button">Export SVG</button>
                     </li>
-                    <!-- <li>
-                        <button class="button button--save-settings">Save Settings</button>
+                    <li class="menu__item">
+                        <button class="button button--save-settings button--full" id="save-settings">Save Settings</button>
+                    </li class="menu__item">
+                    <li class="menu__item">
+                        <ul class="settings-list" id="settings-list">
+                        </ul>
+                        <button class="button button--load-settings button--full" id="load-settings">Load Settings</button>
                     </li>
-                    <li>
-                        <button class="button button--load-settings">Load Settings</button>
-                    </li> -->
+                    <li class="menu__item">
+                        <button class="button button--clear-settings button--full" id="clear-settings">Delete All Saved Settings</button>
+                    </li>
                 </ul>
             </nav>
         </section>
@@ -125,6 +133,7 @@
 <script src="js/lib/underscore-min.js"></script>
 <script src="js/lib/snap.svg-min.js"></script>
 <script src="js/lib/FileSaver.js"></script>
+<script src="js/lib/localforage.js"></script>
 
 <script src="js/loopalo.js"></script>
 

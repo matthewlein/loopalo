@@ -537,28 +537,16 @@ svg path {
 }
 
 @-moz-keyframes dash {
-  from {
-    stroke-dashoffset: 6000;
-  }
-
   to {
     stroke-dashoffset: 0;
   }
 }
 @-webkit-keyframes dash {
-  from {
-    stroke-dashoffset: 6000;
-  }
-
   to {
     stroke-dashoffset: 0;
   }
 }
 @keyframes dash {
-  from {
-    stroke-dashoffset: 6000;
-  }
-
   to {
     stroke-dashoffset: 0;
   }
@@ -692,6 +680,24 @@ svg path {
 
 .menu--open {
   right: -75%;
+}
+
+.menu__item {
+  margin-bottom: 20px;
+}
+
+.settings-list {
+  background-color: #fff;
+}
+
+.settings-list__item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.settings-list__item--active {
+  background-color: #ddd;
 }
 
 /*# sourceMappingURL=style.css.map */
