@@ -499,6 +499,7 @@ li {
 
 .svg-wrapper {
   overflow: hidden;
+  height: 100%;
   border-left: 1px solid grey;
 }
 
@@ -584,6 +585,9 @@ svg path {
   margin-bottom: 20px;
   position: relative;
 }
+.controller__item:last-child {
+  margin-bottom: 0;
+}
 
 .button {
   border: 0;
@@ -654,6 +658,16 @@ svg path {
   width: 80px;
 }
 
+[type="range"] {
+  width: 120px;
+  border: 0;
+}
+
+input {
+  border: 1px solid #aaa;
+  padding: 3px;
+}
+
 .colorpicker-holder {
   position: absolute;
   bottom: 100%;
@@ -684,6 +698,9 @@ svg path {
 
 .menu__item {
   margin-bottom: 20px;
+}
+.menu__item:last-child {
+  margin-bottom: 0;
 }
 
 .settings-list {

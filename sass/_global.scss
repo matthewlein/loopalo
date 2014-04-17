@@ -37,6 +37,8 @@ li {
 
 .svg-wrapper {
     overflow: hidden;
+    // for firefox
+    height: 100%;
 border-left: 1px solid grey;
 }
 

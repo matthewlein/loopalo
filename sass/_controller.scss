@@ -39,6 +39,10 @@
 .controller__item {
     margin-bottom: 20px;
     position: relative;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 //
@@ -102,6 +106,14 @@ $button-radius: 5px;
 }
 .input--color {
     width: 80px;
+}
+[type="range"] {
+    width: 120px;
+    border: 0;
+}
+input {
+    border: 1px solid #aaa;
+    padding: 3px;
 }
 
 .colorpicker-holder {
