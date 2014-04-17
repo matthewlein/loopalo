@@ -58,15 +58,15 @@ var settings = {
     // starting mode
     mode : 'draw',
     // number of lines drawn
-    lineCount : 130,
+    lineCount : 30,
     // how long each line is
-    lineLength : 170,
+    lineLength : 70,
     // how big are loops and straights
-    tileSize : 196,
+    tileSize : 96,
     // line opacity
-    opacity : 1,
+    opacity : 100,
     // page bg color
-    bgColor : '#F3F5DF',
+    bgColor : '#f3f5df',
     // array of strokes
     strokes : [
         {
@@ -339,7 +339,7 @@ Line.prototype.drawPath = function() {
     }
 
     // set opacity on group so it works right
-    this.group.attr('opacity', settings.opacity);
+    this.group.attr('opacity', (settings.opacity/100) );
 
 };
 
@@ -769,18 +769,23 @@ var $modeBtns;
 
 function createController() {
 
+    // menu button
     var $menu = $('#menu');
     var $menuBtn = $('#menu-button');
     $menuBtn.on('click', function() {
         $menuBtn.toggleClass('button--active');
         $menu.toggleClass('menu--open');
     });
+
     // Maybe move onModeChange into here?
 
+    // mode buttons
     $modeBtns = $('[data-mode]');
     $modeBtns.on('mousedown', changeMode);
 
+    // curve size field
     var $curveSizeInput = $('#curve-size');
+    $curveSizeInput.val(settings.tileSize);
     $curveSizeInput.on('change', function() {
         var $this = $(this);
         var val = $this.val();
@@ -789,7 +794,9 @@ function createController() {
         setTileSizes();
     });
 
+    // line length field
     var $lineLengthInput = $('#line-length');
+    $lineLengthInput.val(settings.lineLength);
     $lineLengthInput.on('change', function() {
         var $this = $(this);
         var val = $this.val();
@@ -797,11 +804,13 @@ function createController() {
         settings.lineLength = val;
     });
 
-
+    // draw many lines button
     var $drawManyBtn = $('#draw-many');
     $drawManyBtn.on('click', drawManyLines);
 
+    // line count field
     var $lineCountInput = $('#line-count');
+    $lineCountInput.val(settings.lineCount);
     $lineCountInput.on('change', function() {
         var $this = $(this);
         var val = $this.val();
@@ -809,12 +818,34 @@ function createController() {
         settings.lineCount = val;
     });
 
+    // opacity slider field
+    var $opacityRange = $('#line-opacity');
+    var $opacityInput = $('#line-opacity-input');
+    $opacityRange.val(settings.opacity);
+    $opacityInput.val(settings.opacity);
+    $opacityRange.on('input change', function(event) {
+        var $this = $(this);
+        var val = $this.val();
+        $opacityInput.val(val);
+        settings.opacity = val;
+    });
+    $opacityInput.on('change', function(event) {
+        var $this = $(this);
+        var val = $this.val();
+        $opacityRange.val(val);
+    });
+
+
+
+    // clear canvas
     var $clearCanvasBtn = $('#clear-canvas');
     $clearCanvasBtn.on('click', clearCanvas);
 
+    // add stroke button
     var $addStrokeBtn = $('#add-stroke');
     $addStrokeBtn.on('click', addStroke);
 
+    // shift up/down for 10 increment
     $('.controller').on('keydown','input[type="number"]', function(event) {
 
         var $this = $(this);
@@ -830,9 +861,14 @@ function createController() {
             // if key is up, positive, otherwise its down and go negative
             increment = (key === 38) ? increment : -(increment);
             var num = Number( $this.val() ) + increment;
-            // make sure its not below 0
-            if (num < 0) {
-                num = 0;
+
+            // make sure its not below min or above max
+            var min = Number( $this.attr('min') );
+            var max = Number( $this.attr('max') );
+            if ( !!$this.attr('min') && num < min) {
+                num = min;
+            } else if ( !!$this.attr('min') && num > max ) {
+                num = max;
             }
             $this.val( num );
         }
@@ -842,13 +878,7 @@ function createController() {
 
     });
 
-    var $opacityInput = $('#line-opacity');
-    $opacityInput.on('input change', function(event) {
-        var $this = $(this);
-        var val = $this.val();
 
-        settings.opacity = val;
-    });
 
 
     //

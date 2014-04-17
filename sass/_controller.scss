@@ -38,6 +38,7 @@
 
 .controller__item {
     margin-bottom: 20px;
+    position: relative;
 }
 
 //
@@ -104,7 +105,8 @@ $button-radius: 5px;
 }
 
 .colorpicker-holder {
-    position: relative;
+    position: absolute;
+    bottom: 100%;
 }
 
 //
@@ -113,4 +115,5 @@ $button-radius: 5px;
 
 .stroke {
     padding: 0.5em 0;
+    position: relative;
 }

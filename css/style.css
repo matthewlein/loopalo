@@ -594,6 +594,7 @@ svg path {
 
 .controller__item {
   margin-bottom: 20px;
+  position: relative;
 }
 
 .button {
@@ -666,11 +667,13 @@ svg path {
 }
 
 .colorpicker-holder {
-  position: relative;
+  position: absolute;
+  bottom: 100%;
 }
 
 .stroke {
   padding: 0.5em 0;
+  position: relative;
 }
 
 .menu {

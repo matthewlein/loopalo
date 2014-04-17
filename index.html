@@ -29,7 +29,7 @@
             <div class="draw-many-wrapper controller__item">
                 <button class="button button--inline" id="draw-many">Draw Many</button>
                 <label for="line-count">#</label>
-                <input type="number" id="line-count" value="30">
+                <input type="number" id="line-count" value="" min="1">
             </div>
 
             <div class="clear-canvas-wrapper controller__item">
@@ -38,23 +38,24 @@
 
             <div class="curve-size-wrapper controller__item">
                 <label for="curve-size">Curve Size</label>
-                <input type="number" value="96" id="curve-size">
+                <input type="number" value="" id="curve-size" min="1">
             </div>
 
             <div class="line-length-wrapper controller__item">
                 <label for="line-length">Line Length</label>
-                <input type="number" value="70" id="line-length">
+                <input type="number" value="" id="line-length" min="1">
             </div>
 
             <div class="line-opacity-wrapper controller__item">
                 <label for="line-opacity">Opacity</label>
-                <input type="range" value="1" step="0.01" min="0" max="1" id="line-opacity">
+                <input type="range" value="100" min="0" max="100" step="1" id="line-opacity">
+                <input type="number" min="0" max="100" step="1" id="line-opacity-input">
             </div>
 
             <div class="bg-color-wrapper controller__item">
                 <label for="bg-color">Background Color</label>
                 <div id="bg-color-colorpicker" class="colorpicker-holder"></div>
-                <input type="text" value="#f3f5df" id="bg-color" class="input--color">
+                <input type="text" value="" id="bg-color" class="input--color">
             </div>
 
             <section class="strokes controller__item">
@@ -63,28 +64,32 @@
 
                 <ul class="strokes__list" id="strokes-list">
 
-                    <!--
-                    <li class="stroke">
+
+                    <!-- <li class="stroke">
                         <input type="text" class="stroke-color input--color" value="#41abe6" data-stroke-color="#41abe6">
                         <input type="number" class="stroke-width" value="10" data-stroke-width="10">
-                        <select name="" id="" class="stroke-cap" data-stroke-cap="round">
+                        <select class="stroke-cap" data-stroke-cap="round">
                             <option value="round">Round</option>
                             <option value="square">Square</option>
                             <option value="butt">Butt</option>
                         </select>
-                    </li>
-                    -->
+                        <button class="stroke-delete" data-stroke-delete>x</button>
+                    </li> -->
+
 
                 </ul>
-
-                <h2>Todo:</h2>
-                <ul>
-                    <li>fix numbers going negative</li>
-                    <li>fix numbers not allowing typing or deleting</li>
-                    <li>add stroke</li>
-                </ul>
-
             </section>
+
+
+            <h2>Todo:</h2>
+            <ul>
+                <li>design</li>
+                <li>save settings to localForage</li>
+                <li>load settings from localForage</li>
+                <li>random/inspire mode</li>
+                <li>juice it</li>
+                <li>hide/show stroke</li>
+            </ul>
 
         </section>
 
