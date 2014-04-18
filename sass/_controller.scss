@@ -23,6 +23,7 @@
     height: 100%;
     overflow: auto;
     background-color: #ccc;
+    border-right: 1px solid grey;
 }
 
 .controller__header {
@@ -61,6 +62,7 @@ $button-radius: 5px;
     @include background(
         linear-gradient( rgba(143,143,143,1), rgba(92,92,92,1) )
     );
+    @include transition( opacity 200ms );
 }
 
 .button--group {
@@ -86,6 +88,10 @@ $button-radius: 5px;
     @include background(
         linear-gradient( rgba(92,92,92,1), rgba(143,143,143,1) )
     );
+}
+.button[disabled] {
+    opacity: 0.5;
+    pointer-events : none;
 }
 
 .button--full {

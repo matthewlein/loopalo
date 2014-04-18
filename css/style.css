@@ -500,7 +500,6 @@ li {
 .svg-wrapper {
   overflow: hidden;
   height: 100%;
-  border-left: 1px solid grey;
 }
 
 svg {
@@ -566,6 +565,7 @@ svg path {
   height: 100%;
   overflow: auto;
   background-color: #ccc;
+  border-right: 1px solid grey;
 }
 
 .controller__header {
@@ -606,6 +606,10 @@ svg path {
   background: -o-linear-gradient(#8f8f8f, #5c5c5c);
   background: -webkit-linear-gradient(#8f8f8f, #5c5c5c);
   background: linear-gradient(#8f8f8f, #5c5c5c);
+  -moz-transition: opacity 200ms;
+  -o-transition: opacity 200ms;
+  -webkit-transition: opacity 200ms;
+  transition: opacity 200ms;
 }
 
 .button--group {
@@ -644,6 +648,11 @@ svg path {
   background: -o-linear-gradient(#5c5c5c, #8f8f8f);
   background: -webkit-linear-gradient(#5c5c5c, #8f8f8f);
   background: linear-gradient(#5c5c5c, #8f8f8f);
+}
+
+.button[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .button--full {

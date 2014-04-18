@@ -40,9 +40,6 @@ canvas.attr({
 var cWidth = svgWrapper.offsetWidth;
 var cHeight = svgWrapper.offsetHeight;
 
-
-
-
 // sets the possible moves
 // you can add repeats to increase likelyhood of getting something
 var moves = [
@@ -388,10 +385,8 @@ function drawManyLines() {
 
     // draw all the lines
     for (var j = 0; j < settings.lineCount; j++) {
-
         line = new Line();
         line.drawPath();
-
     }
 
 }
@@ -401,19 +396,19 @@ function drawManyLines() {
 // Filters
 // ------------------------------------------------------------------------- //
 
-var filters = {
-    // invert filter
-    invert : canvas.filter( Snap.filter.invert(1) )
-};
+// var filters = {
+//     // invert filter
+//     invert : canvas.filter( Snap.filter.invert(1) )
+// };
 // set to object bounding box for no clipping
 // huge sizes are the only way to know if it will work
-filters.invert.attr({
-    filterUnits : 'objectBoundingBox',
-    x : '-300%',
-    y : '-300%',
-    width : '600%',
-    height : '600%'
-});
+// filters.invert.attr({
+//     filterUnits : 'objectBoundingBox',
+//     x : '-300%',
+//     y : '-300%',
+//     width : '600%',
+//     height : '600%'
+// });
 
 // ------------------------------------------------------------------------- //
 // Modes
@@ -524,15 +519,6 @@ modes.move = (function() {
             path.attr( 'stroke', path._color );
         });
     }
-    function onGroupPressMove() {
-
-    }
-    function onGroupReleaseMove() {
-
-    }
-    function onPointerMoveMove() {
-
-    }
 
     function bindEvents() {
         var gs = canvas.selectAll('g');
@@ -545,7 +531,6 @@ modes.move = (function() {
         gs.forEach(function(group) {
             // group hover
             group.hover(onGroupOverMove, onGroupOutMove, group, group);
-            group.mousedown(onGroupPressMove);
 
             group.drag(
                 function move( dx, dy, x, y ){
@@ -592,7 +577,6 @@ modes.move = (function() {
         gs.forEach(function(group) {
             // unbind listeners
             group.unhover(onGroupOverMove, onGroupOutMove);
-            group.unmousedown(onGroupPressMove);
             group.undrag();
         });
     }
@@ -768,6 +752,7 @@ function bindEventsGlobal() {
 // ------------------------------------------------------------------------- //
 
 var $modeBtns;
+var $bgColorPicker;
 
 function controller() {
 
@@ -894,7 +879,7 @@ function controller() {
     // the input
     var $bgColorInput = $('#bg-color');
     // make the picker widget
-    var $bgColorPicker = $.farbtastic( $bgColorPickerHolder, function(color) {
+    $bgColorPicker = $.farbtastic( $bgColorPickerHolder, function(color) {
         // set the bg color and text color (based on how dark it is)
         $bgColorInput.css({
             backgroundColor : color,
@@ -1067,13 +1052,40 @@ function makeStrokeHTML(stroke) {
 
     });
 
-    $('#strokes-list').append($strokeHTML);
+    $strokeList.append($strokeHTML);
 }
 
 
-function changeSettings() {
+function updateSettingsUI() {
 
+    // curve size field
+    var $curveSizeInput = $('#curve-size');
+    $curveSizeInput.val(settings.tileSize);
 
+    // line length field
+    var $lineLengthInput = $('#line-length');
+    $lineLengthInput.val(settings.lineLength);
+
+    // line count field
+    var $lineCountInput = $('#line-count');
+    $lineCountInput.val(settings.lineCount);
+
+    // opacity slider field
+    var $opacityRange = $('#line-opacity');
+    var $opacityInput = $('#line-opacity-input');
+    $opacityRange.val(settings.opacity);
+    $opacityInput.val(settings.opacity);
+
+    // Color Picker
+    $bgColorPicker.setColor(settings.bgColor);
+
+    // clear strokes
+    $strokeList.children().remove();
+
+    // make strokes
+    _.each(settings.strokes, function(stroke, index) {
+        makeStrokeHTML(stroke);
+    });
 
 }
 
@@ -1107,7 +1119,6 @@ function menu() {
         $.each(savedSettings, function(index, item) {
             var $li = $('<li class="settings-list__item">' + item.name + '</li>');
             $li.data('name', item.name);
-            $li.data('settings', item.settings);
             $savedSettingsUI.append($li);
         });
         $savedSettingsUI.on('click', 'li', function() {
@@ -1117,6 +1128,8 @@ function menu() {
             var selectedClass = 'settings-list__item--active';
             $this.siblings().removeClass(selectedClass);
             $this.addClass(selectedClass);
+            $loadSettingsBtn.prop('disabled', false);
+            $deleteSettingsBtn.prop('disabled', false);
 
             // set index
             selectedIndex = $this.index();
@@ -1124,6 +1137,13 @@ function menu() {
     }
     getSavedSettings();
 
+    // clearing the selection
+    function clearSettingSelection() {
+        selectedIndex = null;
+        $savedSettingsUI.children().removeClass('settings-list__item--active');
+        $loadSettingsBtn.prop('disabled', true);
+        $deleteSettingsBtn.prop('disabled', true);
+    }
 
     //
     // Save
@@ -1142,8 +1162,8 @@ function menu() {
         localforage.setItem('savedSettings', savedSettings, function(){
             var $li = $('<li class="settings-list__item">' + name + '</li>');
             $li.data('name', name);
-            $li.data('settings', settings);
             $savedSettingsUI.append($li);
+            clearSettingSelection();
         });
     }
 
@@ -1151,21 +1171,40 @@ function menu() {
     // Load
     //
     var $loadSettingsBtn = $('#load-settings');
+    $loadSettingsBtn.prop('disabled', true);
     $loadSettingsBtn.on('click', loadSettings);
 
     function loadSettings() {
-
-        // set appropriate index from UI list
-
         // get from storage
         localforage.getItem('savedSettings', function(data) {
-
-            // remove active class
-            $savedSettingsUI.children().removeClass('settings-list__item--active');
-            // change settings from index
-            console.log(data[selectedIndex]);
-            selectedIndex = null;
+            // set new settings
+            settings = data[selectedIndex].settings;
+            // update the controller
+            updateSettingsUI();
+            clearSettingSelection();
         });
+    }
+
+    //
+    // Delete
+    //
+
+    var $deleteSettingsBtn = $('#delete-settings');
+    $deleteSettingsBtn.prop('disabled', true);
+    $deleteSettingsBtn.on('click', deleteSettings);
+
+    function deleteSettings() {
+
+        // remove the settings from the array
+        savedSettings.splice(selectedIndex, 1);
+
+        // save the changed settings array
+        localforage.setItem('savedSettings', savedSettings, function(){
+            // remove the UI element
+            $savedSettingsUI.children().eq(selectedIndex).remove();
+            clearSettingSelection();
+        })
+
     }
 
     //
@@ -1178,8 +1217,7 @@ function menu() {
         localforage.setItem('savedSettings', null, function() {
             // remove UI list
             $savedSettingsUI.children().remove();
-            // nothing is selected
-            selectedIndex = null;
+            clearSettingSelection();
             // settings list is empty
             savedSettings = [];
         })
