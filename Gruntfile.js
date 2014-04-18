@@ -4,6 +4,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-connect');
 
+    // for publish
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks("grunt-rsync");
+
     // don't watch node_modules
     // used in watch files below
     var excludes = [
@@ -12,6 +17,39 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
 
+        // deletes dist/
+        clean : ['dist/'],
+
+        // copies fresh clean clean into dist/
+        copy : {
+            all : {
+                files : [
+                    {
+                        expand : true,
+                        src : ['css/**', 'img/**', 'js/**', 'index.html'],
+                        dest : 'dist/'
+                    }
+                ]
+            }
+        },
+
+        // stores secrets off source control
+        superSecrets: grunt.file.readJSON('superSecrets.json'),
+
+        // upload to prod
+        rsync : {
+            prod : {
+                options: {
+                    src: 'dist/',
+                    dest: 'httpdocs/',
+                    host:'<%= superSecrets.host %>',
+                    syncDestIgnoreExcl: true,
+                    recursive: true
+                }
+            }
+        },
+
+        // local server
         connect: {
             server: {
                 options: {
@@ -24,6 +62,7 @@ module.exports = function(grunt) {
             }
         },
 
+        // compile sass
         sass: {
             compile: {
                 options: {
@@ -33,8 +72,6 @@ module.exports = function(grunt) {
                     // style: 'compressed',
                     // if you're using compass
                     compass : true,
-                    // line numbers of scss in the css for debugging
-                    // lineNumbers : true,
                     // set up sourcemaps, requires SASS 3.3 and Compass 1.0alpha?
                     sourcemap : true
                 },
@@ -46,6 +83,7 @@ module.exports = function(grunt) {
             }
         },
 
+        // watch files
         watch : {
             options: {
                 livereload: true
@@ -89,6 +127,12 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'connect',
         'watch'
+    ]);
+    // publish live
+    grunt.registerTask('publish', [
+        'clean',
+        'copy',
+        'rsync'
     ]);
 
 };
