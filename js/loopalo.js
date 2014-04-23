@@ -393,6 +393,10 @@ function drawManyLines() {
         line.drawPath();
     }
 
+    // reset the mode so new groups have events
+    modes[doc.mode].off();
+    modes[doc.mode].on();
+
 }
 
 
@@ -506,7 +510,11 @@ modes.draw = (function() {
 //
 modes.move = (function() {
 
+    var isDragging = false;
+
     function onGroupOverMove() {
+
+        if (isDragging) { return; }
 
         var paths = this.selectAll('path');
 
@@ -516,6 +524,8 @@ modes.move = (function() {
 
     }
     function onGroupOutMove() {
+
+        if (isDragging) { return; }
 
         var paths = this.selectAll('path');
 
@@ -534,7 +544,9 @@ modes.move = (function() {
 
         gs.forEach(function(group) {
             // group hover
-            group.hover(onGroupOverMove, onGroupOutMove, group, group);
+            // group.hover(onGroupOverMove, onGroupOutMove, group, group);
+            group.mouseover(onGroupOverMove);
+            group.mouseout(onGroupOutMove);
 
             group.drag(
                 function move( dx, dy, x, y ){
@@ -567,9 +579,12 @@ modes.move = (function() {
                 function start( x, y, event ){
                     lastX = x;
                     lastY = y;
+                    isDragging = true;
+                    this.unmouseout(onGroupOutMove);
                 },
                 function end(event){
-
+                    isDragging = false;
+                    this.mouseout(onGroupOutMove);
                 }
             );
         });
@@ -580,7 +595,8 @@ modes.move = (function() {
 
         gs.forEach(function(group) {
             // unbind listeners
-            group.unhover(onGroupOverMove, onGroupOutMove);
+            group.unmouseover(onGroupOverMove);
+            group.unmouseout(onGroupOutMove);
             group.undrag();
         });
     }
