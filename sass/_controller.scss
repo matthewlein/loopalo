@@ -17,7 +17,6 @@
 }
 
 .controller {
-    padding: 20px;
     position: relative;
     z-index: 200;
     height: 100%;
@@ -29,9 +28,12 @@
 .controller__header {
     position: relative;
     margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px 20px 5px;
 }
 .logo {
     float: left;
+    margin-top: -10px;
 }
 .button--menu {
     float: right;
@@ -39,6 +41,8 @@
 
 .controller__item {
     margin-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
     position: relative;
 
     &:last-child {
@@ -49,6 +53,22 @@
 //
 // Buttons
 //
+// $button-radius: 5px;
+// .button {
+//     border: 0;
+//     outline: 0;
+//     padding: 8px 16px;
+//     color: #fff;
+//     display: inline-block;
+//     vertical-align: middle;
+//     @include border-radius($button-radius);
+//     @include box-shadow( 0 0 2px rgba( 0, 0, 0, 0.2 ) );
+//     @include background(
+//         linear-gradient( rgba(143,143,143,1), rgba(92,92,92,1) )
+//     );
+//     @include transition( opacity 200ms );
+// }
+
 $button-radius: 5px;
 .button {
     border: 0;
@@ -57,23 +77,38 @@ $button-radius: 5px;
     color: #fff;
     display: inline-block;
     vertical-align: middle;
+    position: relative;
+    text-shadow: 0 2px 0 rgba( 0, 0, 0, 0.3);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    border-left: 1px solid rgba(0,0,0,0.1);
+    @include backface-visibility(hidden);
     @include border-radius($button-radius);
-    @include box-shadow( 0 0 2px rgba( 0, 0, 0, 0.2 ) );
-    @include background(
-        linear-gradient( rgba(143,143,143,1), rgba(92,92,92,1) )
+    @include box-shadow(
+        0 4px 0px rgba( 0, 0, 0, 0.65 )
     );
-    @include transition( opacity 200ms );
+    @include background(
+        linear-gradient( hsl(0, 0%, 65%), hsl(0, 0%, 35%) )
+    );
+    @include transition(
+        opacity 100ms
+        // box-shadow 10ms,
+        // transform 10ms
+    );
 }
+
 
 .button--group {
     float: left;
+
     @include border-radius(0px);
 }
 .button--group--left {
+
     @include border-top-left-radius($button-radius);
     @include border-bottom-left-radius($button-radius);
 }
 .button--group--right {
+
     @include border-top-right-radius($button-radius);
     @include border-bottom-right-radius($button-radius);
 }
@@ -81,14 +116,17 @@ $button-radius: 5px;
 .button:active,
 .button--active,
 .button--group--active {
-    padding-top: 9px;
-    padding-bottom: 7px;
-    color: #4469FF;
-    text-shadow: 0 0 4px rgba( 165, 235, 76, 0.75 );
-    @include background(
-        linear-gradient( rgba(92,92,92,1), rgba(143,143,143,1) )
+    top: 3px;
+    // @include translateY(3px);
+    @include box-shadow(
+        0 1px 0px rgba( 0, 0, 0, 0.65 )
     );
+    color: #8EDDF5;
+    // @include background(
+    //     linear-gradient( rgba(92,92,92,1), rgba(143,143,143,1) )
+    // );
 }
+
 .button[disabled] {
     opacity: 0.5;
     pointer-events : none;
@@ -96,6 +134,12 @@ $button-radius: 5px;
 
 .button--full {
     width: 100%;
+}
+.button--1_2 {
+    width: 50%;
+}
+.button--1_3 {
+    width: 33.33%;
 }
 
 .button--inline {
@@ -132,6 +176,13 @@ input {
 //
 
 .stroke {
-    padding: 0.5em 0;
+    margin: 0 -20px;
+    padding: 10px 20px;
     position: relative;
+    border-top: 1px solid rgba( 255, 255, 255, 0.3 );
+    border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
+}
+
+.add-stroke {
+    margin-bottom: 10px;
 }

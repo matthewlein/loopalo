@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------- //
 
 body {
+    font-family: $font-open;
     font-size: 16px;
     background-color: #ccc;
     margin: 0;
@@ -43,7 +44,6 @@ li {
 
 svg {
     display: block;
-    // cursor: pointer;
 }
 
 

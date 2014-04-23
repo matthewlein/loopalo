@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Loopalo</title>
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -16,40 +16,28 @@
         <section class="controller">
 
             <header class="controller__header cf">
-                <h1 class="logo">loopalo</h1>
+                <h1 class="logo">
+                    <img src="img/logo.svg" alt="loopalo">
+                </h1>
                 <button class="button button--menu" id="menu-button">Menu</button>
             </header>
 
+
+
             <div class="modes cf controller__item">
-                <button class="button button--group button--group--left button--group--active" data-mode="draw" id="mode-draw">Draw</button>
-                <button class="button button--group" data-mode="move" id="mode-move">Move</button>
-                <button class="button button--group button--group--right" data-mode="erase" id="mode-erase">Erase</button>
+                <button class="button button--group button--group--left button--group--active button--1_3" data-mode="draw" id="mode-draw"><i class="icon icon-pencil"></i>Draw</button>
+                <button class="button button--group button--1_3" data-mode="move" id="mode-move">Move</button>
+                <button class="button button--group button--group--right button--1_3" data-mode="erase" id="mode-erase">Erase</button>
             </div>
 
             <div class="draw-many-wrapper controller__item">
-                <button class="button button--inline" id="draw-many">Draw Many</button>
+                <button class="button button--inline button--1_2" id="draw-many">Draw Many</button>
                 <label for="line-count">#</label>
                 <input type="number" id="line-count" value="" min="1">
             </div>
 
             <div class="clear-canvas-wrapper controller__item">
-                <button class="button" id="clear-canvas">Clear canvas</button>
-            </div>
-
-            <div class="curve-size-wrapper controller__item">
-                <label for="curve-size">Curve Size</label>
-                <input type="number" value="" id="curve-size" min="1">
-            </div>
-
-            <div class="line-length-wrapper controller__item">
-                <label for="line-length">Line Length</label>
-                <input type="number" value="" id="line-length" min="1">
-            </div>
-
-            <div class="line-opacity-wrapper controller__item">
-                <label for="line-opacity">Opacity</label>
-                <input type="range" value="100" min="0" max="100" step="1" id="line-opacity">
-                <input type="number" min="0" max="100" step="1" id="line-opacity-input">
+                <button class="button button--full" id="clear-canvas">Clear canvas</button>
             </div>
 
             <div class="bg-color-wrapper controller__item">
@@ -58,28 +46,53 @@
                 <input type="text" value="" id="bg-color" class="input--color">
             </div>
 
-            <section class="strokes controller__item">
+            <section class="settings">
 
-                <button class="button add-stroke" id="add-stroke">Add Stroke</button>
+                <h2>Settings</h2>
 
-                <ul class="strokes__list" id="strokes-list">
+                <div class="curve-size-wrapper controller__item">
+                    <label for="curve-size">Curve Size</label>
+                    <input type="number" value="" id="curve-size" min="1">
+                </div>
+
+                <div class="line-length-wrapper controller__item">
+                    <label for="line-length">Line Length</label>
+                    <input type="number" value="" id="line-length" min="1">
+                </div>
+
+                <div class="line-opacity-wrapper controller__item">
+                    <label for="line-opacity">Opacity</label>
+                    <input type="range" value="100" min="0" max="100" step="1" id="line-opacity">
+                    <input type="number" min="0" max="100" step="1" id="line-opacity-input">
+                </div>
 
 
-                    <!-- <li class="stroke">
-                        <input type="text" class="stroke-color input--color" value="#41abe6" data-stroke-color="#41abe6">
-                        <input type="number" class="stroke-width" value="10" data-stroke-width="10">
-                        <select class="stroke-cap" data-stroke-cap="round">
-                            <option value="round">Round</option>
-                            <option value="square">Square</option>
-                            <option value="butt">Butt</option>
-                        </select>
-                        <button class="stroke-delete" data-stroke-delete>x</button>
-                    </li> -->
+
+                <section class="strokes controller__item">
+
+                    <button class="button button--full add-stroke" id="add-stroke">
+                        <i class="icon icon-plus"></i>Add Stroke
+                    </button>
+
+                    <ul class="strokes__list" id="strokes-list">
 
 
-                </ul>
+                        <!-- <li class="stroke">
+                            <input type="text" class="stroke-color input--color" value="#41abe6" data-stroke-color="#41abe6">
+                            <input type="number" class="stroke-width" value="10" data-stroke-width="10">
+                            <select class="stroke-cap" data-stroke-cap="round">
+                                <option value="round">Round</option>
+                                <option value="square">Square</option>
+                                <option value="butt">Butt</option>
+                            </select>
+                            <button class="stroke-delete" data-stroke-delete>x</button>
+                        </li> -->
+
+
+                    </ul>
+                </section>
+
             </section>
-
 
             <h2>Todo:</h2>
             <ul>
@@ -99,11 +112,15 @@
             <nav>
                 <ul class="menu__list">
                     <li class="menu__item">
-                        <button class="button button--export button--full" id="export-button">Export SVG</button>
+                        <button class="button button--export button--full" id="export-button">
+                            <i class="icon icon-export"></i>Export SVG
+                        </button>
                     </li>
                     <li class="menu__item">
-                        <button class="button button--save-settings button--full" id="save-settings">Save Settings</button>
-                    </li class="menu__item">
+                        <button class="button button--save-settings button--full" id="save-settings">
+                            <i class="icon icon-settings"></i>Save Settings
+                        </button>
+                    </li>
                     <li class="menu__item">
                         <ul class="settings-list" id="settings-list">
                         </ul>
