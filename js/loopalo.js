@@ -51,9 +51,15 @@ var moves = [
 // Default settings
 // ------------------------------------------------------------------------- //
 
-var settings = {
+// the document state
+var doc = {
     // starting mode
     mode : 'draw',
+    // page bg color
+    bgColor : '#f3f5df',
+};
+
+var settings = {
     // number of lines drawn
     lineCount : 30,
     // how long each line is
@@ -62,8 +68,6 @@ var settings = {
     tileSize : 96,
     // line opacity
     opacity : 100,
-    // page bg color
-    bgColor : '#f3f5df',
     // array of strokes
     strokes : [
         {
@@ -367,7 +371,7 @@ function drawBg() {
     // svg doesn't have a bg color, using rect instead
     bgRect = canvas.rect( 0, 0, '100%', '100%');
     bgRect.attr({
-        fill : settings.bgColor
+        fill : doc.bgColor
     });
 }
 
@@ -666,13 +670,13 @@ function changeMode() {
     $modeBtns.removeClass(activeClass);
     $this.addClass(activeClass);
 
-    settings.mode = newMode;
+    doc.mode = newMode;
     onModeChange();
 }
 
 function onModeChange(mode) {
 
-    var mode = settings.mode;
+    var mode = doc.mode;
 
     if (mode === 'draw') {
         // offs
@@ -820,6 +824,7 @@ function controller() {
         var $this = $(this);
         var val = $this.val();
         $opacityRange.val(val);
+        settings.opacity = val;
     });
 
 
@@ -839,8 +844,11 @@ function controller() {
 
         var key = event.which;
         // shift key jump by 10
-        var step = this.step || 1;
+        var step = Number(this.step) || 1;
         var increment = event.shiftKey ? ( step * 10 ) : step;
+        // to make sure its not below min or above max
+        var min = Number( $this.attr('min') );
+        var max = Number( $this.attr('max') );
 
         if (key === 38 || key === 40) {
             // only prevent on these keys
@@ -849,12 +857,9 @@ function controller() {
             increment = (key === 38) ? increment : -(increment);
             var num = Number( $this.val() ) + increment;
 
-            // make sure its not below min or above max
-            var min = Number( $this.attr('min') );
-            var max = Number( $this.attr('max') );
             if ( !!$this.attr('min') && num < min) {
                 num = min;
-            } else if ( !!$this.attr('min') && num > max ) {
+            } else if ( !!$this.attr('max') && num > max ) {
                 num = max;
             }
             $this.val( num );
@@ -888,14 +893,14 @@ function controller() {
         // set the input value to the color
         $bgColorInput.val(color);
         // set the settings bg color to color
-        settings.bgColor = color;
+        doc.bgColor = color;
         // set the bg shape's bg color
         bgRect.attr({
             fill : color
         });
     });
     // set the picker color to the bg color
-    $bgColorPicker.setColor(settings.bgColor);
+    $bgColorPicker.setColor(doc.bgColor);
     // on focus/blur show and hide
     $bgColorInput.on('focus', function() {
         $bgColorPickerHolder.show();
@@ -1077,7 +1082,7 @@ function updateSettingsUI() {
     $opacityInput.val(settings.opacity);
 
     // Color Picker
-    $bgColorPicker.setColor(settings.bgColor);
+    $bgColorPicker.setColor(doc.bgColor);
 
     // clear strokes
     $strokeList.children().remove();
