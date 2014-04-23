@@ -24,31 +24,35 @@
 
 
 
-            <div class="modes cf controller__item">
-                <button class="button button--group button--group--left button--group--active button--1_3" data-mode="draw" id="mode-draw"><i class="icon icon-pencil"></i>Draw</button>
-                <button class="button button--group button--1_3" data-mode="move" id="mode-move">Move</button>
-                <button class="button button--group button--group--right button--1_3" data-mode="erase" id="mode-erase">Erase</button>
-            </div>
+            <section class="canvas-settings">
 
-            <div class="draw-many-wrapper controller__item">
-                <button class="button button--inline button--1_2" id="draw-many">Draw Many</button>
-                <label for="line-count">#</label>
-                <input type="number" id="line-count" value="" min="1">
-            </div>
+                <div class="modes cf controller__item">
+                    <button class="button button--group button--group--left button--group--active button--1_3" data-mode="draw" id="mode-draw"><i class="icon icon-pencil"></i>Draw</button>
+                    <button class="button button--group button--1_3" data-mode="move" id="mode-move">Move</button>
+                    <button class="button button--group button--group--right button--1_3" data-mode="erase" id="mode-erase">Erase</button>
+                </div>
 
-            <div class="clear-canvas-wrapper controller__item">
-                <button class="button button--full" id="clear-canvas">Clear canvas</button>
-            </div>
+                <div class="draw-many-wrapper controller__item">
+                    <button class="button button--inline button--1_2" id="draw-many">Draw Many</button>
+                    <label for="line-count">#</label>
+                    <input type="number" id="line-count" value="" min="1">
+                </div>
 
-            <div class="bg-color-wrapper controller__item">
-                <label for="bg-color">Background Color</label>
-                <div id="bg-color-colorpicker" class="colorpicker-holder"></div>
-                <input type="text" value="" id="bg-color" class="input--color">
-            </div>
+                <div class="clear-canvas-wrapper controller__item">
+                    <button class="button button--full" id="clear-canvas">Clear canvas</button>
+                </div>
 
-            <section class="settings">
+                <div class="bg-color-wrapper controller__item">
+                    <label for="bg-color">Background Color</label>
+                    <div id="bg-color-colorpicker" class="colorpicker-holder"></div>
+                    <input type="text" value="" id="bg-color" class="input--color">
+                </div>
 
-                <h2>Settings</h2>
+            </section>
+
+            <section class="draw-settings">
+
+                <h2 class="draw-settings__heading controller__item">Settings</h2>
 
                 <div class="curve-size-wrapper controller__item">
                     <label for="curve-size">Curve Size</label>
@@ -100,6 +104,7 @@
                 <li>refactor</li>
                 <li>disable draw many on move, erase modes</li>
                 <li>reorder strokes</li>
+                <li>better save settings popup</li>
                 <li>hide/show stroke</li>
                 <li>juice up effects/transitions</li>
                 <li>random/inspire mode</li>

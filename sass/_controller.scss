@@ -27,7 +27,6 @@
 
 .controller__header {
     position: relative;
-    margin-bottom: 20px;
     background-color: #fff;
     padding: 20px 20px 5px;
 }
@@ -41,8 +40,6 @@
 
 .controller__item {
     margin-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
     position: relative;
 
     &:last-child {
@@ -50,24 +47,21 @@
     }
 }
 
-//
-// Buttons
-//
-// $button-radius: 5px;
-// .button {
-//     border: 0;
-//     outline: 0;
-//     padding: 8px 16px;
-//     color: #fff;
-//     display: inline-block;
-//     vertical-align: middle;
-//     @include border-radius($button-radius);
-//     @include box-shadow( 0 0 2px rgba( 0, 0, 0, 0.2 ) );
-//     @include background(
-//         linear-gradient( rgba(143,143,143,1), rgba(92,92,92,1) )
-//     );
-//     @include transition( opacity 200ms );
-// }
+.canvas-settings {
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.draw-settings {
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+}
+.draw-settings__heading {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-top: 0;
+}
+
 
 $button-radius: 5px;
 .button {
