@@ -400,27 +400,36 @@ table {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-pencil:before {
+.icon--solo {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.icon--pencil:before {
   content: "\e600";
 }
 
-.icon-export:before {
+.icon--export:before {
   content: "\e601";
 }
 
-.icon-settings:before {
+.icon--settings:before {
   content: "\e602";
 }
 
-.icon-menu:before {
+.icon--menu {
+  font-size: 1.5em;
+}
+
+.icon--menu:before {
   content: "\e603";
 }
 
-.icon-close:before {
+.icon--close:before {
   content: "\e604";
 }
 
-.icon-plus:before {
+.icon--plus:before {
   content: "\e605";
 }
 
@@ -612,10 +621,6 @@ svg path {
   margin-top: -10px;
 }
 
-.button--menu {
-  float: right;
-}
-
 .controller__item {
   margin-bottom: 20px;
   position: relative;
@@ -723,6 +728,12 @@ svg path {
   width: 33.33%;
 }
 
+.button--menu {
+  float: right;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
 [type="number"] {
   width: 50px;
 }
@@ -756,6 +767,12 @@ input {
 
 .add-stroke {
   margin-bottom: 10px;
+}
+
+.stroke-delete {
+  position: absolute;
+  right: -1px;
+  top: -2px;
 }
 
 .menu {

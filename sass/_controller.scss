@@ -34,10 +34,6 @@
     float: left;
     margin-top: -10px;
 }
-.button--menu {
-    float: right;
-}
-
 .controller__item {
     margin-bottom: 20px;
     position: relative;
@@ -141,6 +137,13 @@ $button-radius: 5px;
 }
 
 
+.button--menu {
+    float: right;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+
 
 //
 // Inputs
@@ -179,4 +182,10 @@ input {
 
 .add-stroke {
     margin-bottom: 10px;
+}
+
+.stroke-delete {
+    position: absolute;
+    right: -1px;
+    top: -2px;
 }
