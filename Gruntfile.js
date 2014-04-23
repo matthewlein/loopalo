@@ -1,13 +1,10 @@
 module.exports = function(grunt) {
 
+    require('time-grunt')(grunt);
+
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-connect');
-
-    // for publish
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks("grunt-rsync");
 
     // don't watch node_modules
     // used in watch files below
@@ -86,6 +83,7 @@ module.exports = function(grunt) {
         // watch files
         watch : {
             options: {
+                // spawn: false,
                 livereload: true
             },
             // make a subtask for each filetype to selectively run tasks and livereload
@@ -129,10 +127,11 @@ module.exports = function(grunt) {
         'watch'
     ]);
     // publish live
-    grunt.registerTask('publish', [
-        'clean',
-        'copy',
-        'rsync'
-    ]);
+    grunt.registerTask('publish', [], function() {
+        grunt.loadNpmTasks('grunt-contrib-clean');
+        grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-rsync');
+        grunt.task.run('clean', 'copy', 'rsync');
+    });
 
 };
