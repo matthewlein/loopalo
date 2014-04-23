@@ -974,7 +974,7 @@ var strokeTemplate = [
             '<option value="square">Square</option>',
             '<option value="butt">Butt</option>',
         '</select>',
-        '<button class="stroke-delete" data-stroke-delete>x</button>',
+        '<button class="stroke-delete" data-stroke-delete><i class="icon icon--solo icon--close"></i></button>',
     '</li>'
 // join with newline or no??? hmmm
 ].join('\n');
