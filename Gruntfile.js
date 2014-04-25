@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                 files : [
                     {
                         expand : true,
-                        src : ['css/**', 'img/**', 'js/**', 'index.html'],
+                        src : ['css/**', 'img/**', 'js/**', 'fonts/**', 'index.html', '.htaccess'],
                         dest : 'dist/'
                     }
                 ]
@@ -131,7 +131,7 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks('grunt-contrib-clean');
         grunt.loadNpmTasks('grunt-contrib-copy');
         grunt.loadNpmTasks('grunt-rsync');
-        grunt.task.run('clean', 'copy', 'rsync');
+        grunt.task.run('copy', 'rsync', 'clean');
     });
 
 };
