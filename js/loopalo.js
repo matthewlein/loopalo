@@ -930,6 +930,11 @@ function controller() {
         makeStrokeHTML(stroke);
     });
 
+    // draggable
+    makeStrokesSortable();
+    // events
+    $strokeList.on('sortupdate', rebuildStrokeSettings);
+
 }
 
 
@@ -962,10 +967,18 @@ function rebuildStrokeSettings() {
     });
 }
 
+function makeStrokesSortable() {
+    $strokeList.sortable('destroy');
+    $strokeList.sortable({
+        handle : '.stroke__handle'
+    });
+}
+
 
 
 var strokeTemplate = [
     '<li class="stroke">',
+        '<div class="stroke__handle"></div>',
         '<div class="colorpicker-holder" data-color-picker></div>',
         '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
         '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
@@ -998,6 +1011,7 @@ function addStroke() {
     var newStroke = settings.strokes[newStrokeIndex];
 
     makeStrokeHTML(newStroke);
+    makeStrokesSortable();
 
 }
 
@@ -1057,7 +1071,7 @@ function makeStrokeHTML(stroke) {
     // Change events update data
     //
 
-    $strokeHTML.on('change keyup', function(event) {
+    $strokeHTML.on('change keyup', function() {
 
         var $this = $(this);
 
@@ -1107,6 +1121,9 @@ function updateSettingsUI() {
     _.each(settings.strokes, function(stroke, index) {
         makeStrokeHTML(stroke);
     });
+
+    // draggable
+    makeStrokesSortable();
 
 }
 
