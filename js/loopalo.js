@@ -969,16 +969,14 @@ function rebuildStrokeSettings() {
 
 function makeStrokesSortable() {
     $strokeList.sortable('destroy');
-    $strokeList.sortable({
-        handle : '.stroke__handle'
-    });
+    $strokeList.sortable();
 }
 
 
 
 var strokeTemplate = [
     '<li class="stroke">',
-        '<div class="stroke__handle"></div>',
+        // '<div class="stroke__handle"></div>',
         '<div class="colorpicker-holder" data-color-picker></div>',
         '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
         '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',

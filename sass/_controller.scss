@@ -180,7 +180,7 @@ input {
 
 .stroke {
     margin: 0 -20px;
-    padding: 10px 20px 10px 40px;
+    padding: 10px 20px 10px 20px;
     position: relative;
     border-top: 1px solid rgba( 255, 255, 255, 0.3 );
     border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
@@ -216,4 +216,5 @@ input {
 }
 .sortable-dragging {
     background-color: #ccc;
+    cursor: move;
 }
