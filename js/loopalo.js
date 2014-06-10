@@ -293,7 +293,6 @@ Line.prototype.drawPath = function() {
 
         // necessary so the transition works as XXXX then 0
         setTimeout(function() {
-            // debugger
             path.node.style[prefixedDuration] = duration;
             path.attr('strokeDashoffset', 0);
         }, 0);
@@ -1264,6 +1263,19 @@ function menu() {
 function exportSVG() {
 
     var SVGstring = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + (new XMLSerializer).serializeToString(canvas.node);
+
+    // export cleanup
+    var dashOffset = new RegExp('\s*stroke-dashoffset.+?;', 'g');
+    var dashArray = new RegExp('\s*stroke-dasharray.+?;', 'g');
+    var transition = new RegExp('\s*[-webkit moz ms]*-?transition.+?;', 'g');
+    var commaSpace = new RegExp(', ', 'g');
+
+    // remove this stuff
+    SVGstring = SVGstring.replace(dashOffset, '');
+    SVGstring = SVGstring.replace(dashArray, '');
+    SVGstring = SVGstring.replace(transition, '');
+    // replace ', ' with ','
+    SVGstring = SVGstring.replace(commaSpace, ',');
 
     // uses FileSaver script
     saveAs(
