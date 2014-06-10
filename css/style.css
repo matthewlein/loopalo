@@ -622,7 +622,7 @@ svg path {
 }
 
 .controller__item {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   position: relative;
 }
 .controller__item:last-child {
@@ -636,7 +636,7 @@ svg path {
 }
 
 .draw-settings {
-  padding: 20px;
+  padding: 7px 20px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -726,6 +726,10 @@ svg path {
 
 .button--1_3 {
   width: 33.33%;
+}
+
+.button--snug {
+  margin-bottom: 4px;
 }
 
 .button--menu {

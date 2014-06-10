@@ -1,6 +1,6 @@
 /*!
     localForage -- Offline Storage, Improved
-    Version 0.1.0
+    Version 0.8.1
     http://mozilla.github.io/localForage
     (c) 2013-2014 Mozilla, Apache License 2.0
 */
@@ -162,7 +162,7 @@ define("promise/asap",
     "use strict";
     var browserGlobal = (typeof window !== 'undefined') ? window : {};
     var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-    var local = (typeof global !== 'undefined') ? global : this;
+    var local = (typeof global !== 'undefined') ? global : (this === undefined? window:this);
 
     // node
     function useNextTick() {
@@ -221,77 +221,6 @@ define("promise/asap",
 
     __exports__.asap = asap;
   });
-define("promise/cast",
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    /**
-      `RSVP.Promise.cast` returns the same promise if that promise shares a constructor
-      with the promise being casted.
-
-      Example:
-
-      ```javascript
-      var promise = RSVP.resolve(1);
-      var casted = RSVP.Promise.cast(promise);
-
-      console.log(promise === casted); // true
-      ```
-
-      In the case of a promise whose constructor does not match, it is assimilated.
-      The resulting promise will fulfill or reject based on the outcome of the
-      promise being casted.
-
-      In the case of a non-promise, a promise which will fulfill with that value is
-      returned.
-
-      Example:
-
-      ```javascript
-      var value = 1; // could be a number, boolean, string, undefined...
-      var casted = RSVP.Promise.cast(value);
-
-      console.log(value === casted); // false
-      console.log(casted instanceof RSVP.Promise) // true
-
-      casted.then(function(val) {
-        val === value // => true
-      });
-      ```
-
-      `RSVP.Promise.cast` is similar to `RSVP.resolve`, but `RSVP.Promise.cast` differs in the
-      following ways:
-      * `RSVP.Promise.cast` serves as a memory-efficient way of getting a promise, when you
-      have something that could either be a promise or a value. RSVP.resolve
-      will have the same effect but will create a new promise wrapper if the
-      argument is a promise.
-      * `RSVP.Promise.cast` is a way of casting incoming thenables or promise subclasses to
-      promises of the exact class specified, so that the resulting object's `then` is
-      ensured to have the behavior of the constructor you are calling cast on (i.e., RSVP.Promise).
-
-      @method cast
-      @for RSVP
-      @param {Object} object to be casted
-      @return {Promise} promise that is fulfilled when all properties of `promises`
-      have been fulfilled, or rejected if any of them become rejected.
-    */
-
-
-    function cast(object) {
-      /*jshint validthis:true */
-      if (object && typeof object === 'object' && object.constructor === this) {
-        return object;
-      }
-
-      var Promise = this;
-
-      return new Promise(function(resolve) {
-        resolve(object);
-      });
-    }
-
-    __exports__.cast = cast;
-  });
 define("promise/config",
   ["exports"],
   function(__exports__) {
@@ -315,49 +244,58 @@ define("promise/polyfill",
   ["./promise","./utils","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
+    /*global self*/
     var RSVPPromise = __dependency1__.Promise;
     var isFunction = __dependency2__.isFunction;
 
     function polyfill() {
+      var local;
+
+      if (typeof global !== 'undefined') {
+        local = global;
+      } else if (typeof window !== 'undefined' && window.document) {
+        local = window;
+      } else {
+        local = self;
+      }
+
       var es6PromiseSupport =
-        "Promise" in window &&
+        "Promise" in local &&
         // Some of these methods are missing from
         // Firefox/Chrome experimental implementations
-        "cast" in window.Promise &&
-        "resolve" in window.Promise &&
-        "reject" in window.Promise &&
-        "all" in window.Promise &&
-        "race" in window.Promise &&
+        "resolve" in local.Promise &&
+        "reject" in local.Promise &&
+        "all" in local.Promise &&
+        "race" in local.Promise &&
         // Older version of the spec had a resolver object
         // as the arg rather than a function
         (function() {
           var resolve;
-          new window.Promise(function(r) { resolve = r; });
+          new local.Promise(function(r) { resolve = r; });
           return isFunction(resolve);
         }());
 
       if (!es6PromiseSupport) {
-        window.Promise = RSVPPromise;
+        local.Promise = RSVPPromise;
       }
     }
 
     __exports__.polyfill = polyfill;
   });
 define("promise/promise",
-  ["./config","./utils","./cast","./all","./race","./resolve","./reject","./asap","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
+  ["./config","./utils","./all","./race","./resolve","./reject","./asap","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
     "use strict";
     var config = __dependency1__.config;
     var configure = __dependency1__.configure;
     var objectOrFunction = __dependency2__.objectOrFunction;
     var isFunction = __dependency2__.isFunction;
     var now = __dependency2__.now;
-    var cast = __dependency3__.cast;
-    var all = __dependency4__.all;
-    var race = __dependency5__.race;
-    var staticResolve = __dependency6__.resolve;
-    var staticReject = __dependency7__.reject;
-    var asap = __dependency8__.asap;
+    var all = __dependency3__.all;
+    var race = __dependency4__.race;
+    var staticResolve = __dependency5__.resolve;
+    var staticReject = __dependency6__.reject;
+    var asap = __dependency7__.asap;
 
     var counter = 0;
 
@@ -480,7 +418,6 @@ define("promise/promise",
     };
 
     Promise.all = all;
-    Promise.cast = cast;
     Promise.race = race;
     Promise.resolve = staticResolve;
     Promise.reject = staticReject;
@@ -708,42 +645,15 @@ define("promise/resolve",
   ["exports"],
   function(__exports__) {
     "use strict";
-    /**
-      `RSVP.resolve` returns a promise that will become fulfilled with the passed
-      `value`. `RSVP.resolve` is essentially shorthand for the following:
-
-      ```javascript
-      var promise = new RSVP.Promise(function(resolve, reject){
-        resolve(1);
-      });
-
-      promise.then(function(value){
-        // value === 1
-      });
-      ```
-
-      Instead of writing the above, your code now simply becomes the following:
-
-      ```javascript
-      var promise = RSVP.resolve(1);
-
-      promise.then(function(value){
-        // value === 1
-      });
-      ```
-
-      @method resolve
-      @for RSVP
-      @param {Any} value value that the returned promise will be resolved with
-      @param {String} label optional string for identifying the returned promise.
-      Useful for tooling.
-      @return {Promise} a promise that will become fulfilled with the given
-      `value`
-    */
     function resolve(value) {
       /*jshint validthis:true */
+      if (value && typeof value === 'object' && value.constructor === this) {
+        return value;
+      }
+
       var Promise = this;
-      return new Promise(function(resolve, reject) {
+
+      return new Promise(function(resolve) {
         resolve(value);
       });
     }
@@ -777,18 +687,19 @@ define("promise/utils",
     __exports__.now = now;
   });
 requireModule('promise/polyfill').polyfill();
-}());(function() {
+}());// Some code originally from async_storage.js in
+// [Gaia](https://github.com/mozilla-b2g/gaia).
+(function() {
     'use strict';
 
     // Originally found in https://github.com/mozilla-b2g/gaia/blob/e8f624e4cc9ea945727278039b3bc9bcb9f8667a/shared/js/async_storage.js
 
-    var Promise = this.Promise;
+    // Promises!
+    var Promise = (typeof module !== 'undefined' && module.exports) ?
+                  require('promise') : this.Promise;
+
     var db = null;
-    var dbInfo = {
-        name: 'localforage',
-        storeName: 'keyvaluepairs',
-        version: 1
-    };
+    var dbInfo = {};
 
     // Initialize IndexedDB; fall back to vendor-prefixed versions if needed.
     var indexedDB = indexedDB || this.indexedDB || this.webkitIndexedDB ||
@@ -801,20 +712,18 @@ requireModule('promise/polyfill').polyfill();
     }
 
     // Open the IndexedDB database (automatically creates one if one didn't
-    // previously exist), using any options set in window.localForageConfig.
+    // previously exist), using any options set in the config.
     function _initStorage(options) {
         if (options) {
-            for (var i in dbInfo) {
-                if (options[i] !== undefined) {
-                    dbInfo[i] = options[i];
-                }
+            for (var i in options) {
+                dbInfo[i] = options[i];
             }
         }
 
         return new Promise(function(resolve, reject) {
             var openreq = indexedDB.open(dbInfo.name, dbInfo.version);
             openreq.onerror = function withStoreOnError() {
-                reject(openreq.error.name);
+                reject(openreq.error);
             };
             openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
                 // First time setup: create an empty object store
@@ -831,21 +740,27 @@ requireModule('promise/polyfill').polyfill();
         var _this = this;
         return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readonly')
+                              .objectStore(dbInfo.storeName);
                 var req = store.get(key);
-                req.onsuccess = function getItemOnSuccess() {
+
+                req.onsuccess = function() {
                     var value = req.result;
                     if (value === undefined) {
                         value = null;
                     }
-                    if (callback) {
-                        callback(value);
-                    }
+
+                    deferCallback(callback,value);
 
                     resolve(value);
                 };
-                req.onerror = function getItemOnError() {
-                    reject(req.error.name);
+
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
                 };
             });
         });
@@ -855,7 +770,8 @@ requireModule('promise/polyfill').polyfill();
         var _this = this;
         return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readwrite').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readwrite')
+                              .objectStore(dbInfo.storeName);
 
                 // Cast to undefined so the value passed to callback/promise is
                 // the same as what one would get out of `getItem()` later.
@@ -867,15 +783,17 @@ requireModule('promise/polyfill').polyfill();
                 }
 
                 var req = store.put(value, key);
-                req.onsuccess = function setItemOnSuccess() {
-                    if (callback) {
-                        callback(value);
-                    }
+                req.onsuccess = function() {
+                    deferCallback(callback,value);
 
                     resolve(value);
                 };
-                req.onerror = function setItemOnError() {
-                    reject(req.error.name);
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
                 };
             });
         });
@@ -885,7 +803,8 @@ requireModule('promise/polyfill').polyfill();
         var _this = this;
         return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readwrite').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readwrite')
+                              .objectStore(dbInfo.storeName);
 
                 // We use `['delete']` instead of `.delete` because IE 8 will
                 // throw a fit if it sees the reserved word "delete" in this
@@ -897,14 +816,33 @@ requireModule('promise/polyfill').polyfill();
                 // make sure the minify step doesn't optimise this to `.delete`,
                 // though it currently doesn't.
                 var req = store['delete'](key);
-                req.onsuccess = function removeItemOnSuccess() {
-                    if (callback) {
-                        callback();
-                    }
+                req.onsuccess = function() {
+
+                    deferCallback(callback);
+
                     resolve();
                 };
-                req.onerror = function removeItemOnError() {
-                    reject(req.error.name);
+
+                req.onerror = function() {
+                    if (callback) {
+                        callback(req.error);
+                    }
+
+                    reject(req.error);
+                };
+
+                // The request will be aborted if we've exceeded our storage
+                // space. In this case, we will reject with a specific
+                // "QuotaExceededError".
+                req.onabort = function(event) {
+                    var error = event.target.error;
+                    if (error === 'QuotaExceededError') {
+                        if (callback) {
+                            callback(error);
+                        }
+
+                        reject(error);
+                    }
                 };
             });
         });
@@ -914,17 +852,22 @@ requireModule('promise/polyfill').polyfill();
         var _this = this;
         return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readwrite').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readwrite')
+                              .objectStore(dbInfo.storeName);
                 var req = store.clear();
-                req.onsuccess = function clearOnSuccess() {
-                    if (callback) {
-                        callback();
-                    }
+
+                req.onsuccess = function() {
+                    deferCallback(callback);
 
                     resolve();
                 };
-                req.onerror = function clearOnError() {
-                    reject(req.error.name);
+
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
                 };
             });
         });
@@ -934,17 +877,24 @@ requireModule('promise/polyfill').polyfill();
         var _this = this;
         return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readonly')
+                              .objectStore(dbInfo.storeName);
                 var req = store.count();
-                req.onsuccess = function lengthOnSuccess() {
+
+                req.onsuccess = function() {
                     if (callback) {
                         callback(req.result);
                     }
 
                     resolve(req.result);
                 };
-                req.onerror = function lengthOnError() {
-                    reject(req.error.name);
+
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
                 };
             });
         });
@@ -964,11 +914,12 @@ requireModule('promise/polyfill').polyfill();
             }
 
             _this.ready().then(function() {
-                var store = db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
+                var store = db.transaction(dbInfo.storeName, 'readonly')
+                              .objectStore(dbInfo.storeName);
 
                 var advanced = false;
                 var req = store.openCursor();
-                req.onsuccess = function keyOnSuccess() {
+                req.onsuccess = function() {
                     var cursor = req.result;
                     if (!cursor) {
                         // this means there weren't enough keys
@@ -980,8 +931,10 @@ requireModule('promise/polyfill').polyfill();
 
                         return;
                     }
+
                     if (n === 0) {
-                        // We have the first key, return it if that's what they wanted
+                        // We have the first key, return it if that's what they
+                        // wanted.
                         if (callback) {
                             callback(cursor.key);
                         }
@@ -989,7 +942,8 @@ requireModule('promise/polyfill').polyfill();
                         resolve(cursor.key);
                     } else {
                         if (!advanced) {
-                            // Otherwise, ask the cursor to skip ahead n records
+                            // Otherwise, ask the cursor to skip ahead n
+                            // records.
                             advanced = true;
                             cursor.advance(n);
                         } else {
@@ -1003,11 +957,66 @@ requireModule('promise/polyfill').polyfill();
                     }
                 };
 
-                req.onerror = function keyOnError() {
-                    reject(req.error.name);
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
                 };
             });
         });
+    }
+
+    function keys(callback) {
+        var _this = this;
+
+        return new Promise(function(resolve, reject) {
+            _this.ready().then(function() {
+                var store = db.transaction(dbInfo.storeName, 'readonly')
+                              .objectStore(dbInfo.storeName);
+
+                var req = store.openCursor();
+                var keys = [];
+
+                req.onsuccess = function() {
+                    var cursor = req.result;
+
+                    if (!cursor) {
+                        if (callback) {
+                            callback(keys);
+                        }
+
+                        resolve(keys);
+                        return;
+                    }
+
+                    keys.push(cursor.key);
+                    cursor.continue();
+                };
+
+                req.onerror = function() {
+                    if (callback) {
+                        callback(null, req.error);
+                    }
+
+                    reject(req.error);
+                };
+            });
+        });
+    }
+
+    // Under Chrome the callback is called before the changes (save, clear)
+    // are actually made. So we use a defer function which wait that the
+    // call stack to be empty.
+    // For more info : https://github.com/mozilla/localForage/issues/175
+    // Pull request : https://github.com/mozilla/localForage/pull/178
+    function deferCallback(callback, value) {
+        if (callback) {
+            return setTimeout(function() {
+                return callback(value);
+            }, 0);
+        }
     }
 
     var asyncStorage = {
@@ -1018,7 +1027,8 @@ requireModule('promise/polyfill').polyfill();
         removeItem: removeItem,
         clear: clear,
         length: length,
-        key: key
+        key: key,
+        keys: keys
     };
 
     if (typeof define === 'function' && define.amd) {
@@ -1039,10 +1049,10 @@ requireModule('promise/polyfill').polyfill();
     'use strict';
 
     var keyPrefix = '';
-    var dbInfo = {
-        name: 'localforage'
-    };
-    var Promise = this.Promise;
+    var dbInfo = {};
+    // Promises!
+    var Promise = (typeof module !== 'undefined' && module.exports) ?
+                  require('promise') : this.Promise;
     var localStorage = null;
 
     // If the app is running inside a Google Chrome packaged webapp, or some
@@ -1058,14 +1068,11 @@ requireModule('promise/polyfill').polyfill();
         return;
     }
 
-    // Config the localStorage backend, using options set in
-    // window.localForageConfig.
+    // Config the localStorage backend, using options set in the config.
     function _initStorage(options) {
         if (options) {
-            for (var i in dbInfo) {
-                if (options[i] !== undefined) {
-                    dbInfo[i] = options[i];
-                }
+            for (var i in options) {
+                dbInfo[i] = options[i];
             }
         }
 
@@ -1127,11 +1134,15 @@ requireModule('promise/polyfill').polyfill();
                     }
 
                     if (callback) {
-                        callback(result);
+                        callback(result, null);
                     }
 
                     resolve(result);
                 } catch (e) {
+                    if (callback) {
+                        callback(null, e);
+                    }
+
                     reject(e);
                 }
             });
@@ -1154,6 +1165,26 @@ requireModule('promise/polyfill').polyfill();
                     callback(result);
                 }
                 resolve(result);
+            });
+        });
+    }
+
+    function keys(callback) {
+        var _this = this;
+        return new Promise(function(resolve) {
+            _this.ready().then(function() {
+                var length = localStorage.length;
+                var keys = [];
+
+                for (var i = 0; i < length; i++) {
+                    keys.push(localStorage.key(i).substring(keyPrefix.length));
+                }
+
+                if (callback) {
+                    callback(keys);
+                }
+
+                resolve(keys);
             });
         });
     }
@@ -1317,9 +1348,7 @@ requireModule('promise/polyfill').polyfill();
                 }
             }
 
-            var str = _bufferToString(buffer);
-
-            callback(null, marker + str);
+            callback(marker + _bufferToString(buffer));
         } else if (valueString === "[object Blob]") {
             // Conver the blob to a binaryArray and then to a string.
             var fileReader = new FileReader();
@@ -1327,18 +1356,19 @@ requireModule('promise/polyfill').polyfill();
             fileReader.onload = function() {
                 var str = _bufferToString(this.result);
 
-                callback(null, SERIALIZED_MARKER + TYPE_BLOB + str);
+                callback(SERIALIZED_MARKER + TYPE_BLOB + str);
             };
 
             fileReader.readAsArrayBuffer(value);
         } else {
             try {
-                callback(null, JSON.stringify(value));
+                callback(JSON.stringify(value));
             } catch (e) {
-                if (window.console && window.console.error) {
-                    window.console.error("Couldn't convert value into a JSON string: ", value);
+                if (this.console && this.console.error) {
+                    this.console.error("Couldn't convert value into a JSON string: ", value);
                 }
-                callback(e);
+
+                callback(null, e);
             }
         }
     }
@@ -1360,11 +1390,28 @@ requireModule('promise/polyfill').polyfill();
                 // Save the original value to pass to the callback.
                 var originalValue = value;
 
-                _serialize(value, function setSerialized(error, value) {
+                _serialize(value, function(value, error) {
                     if (error) {
+                        if (callback) {
+                            callback(null, error);
+                        }
+
                         reject(error);
                     } else {
-                        localStorage.setItem(keyPrefix + key, value);
+                        try {
+                            localStorage.setItem(keyPrefix + key, value);
+                        } catch (e) {
+                            // localStorage capacity exceeded.
+                            // TODO: Make this a specific error/event.
+                            if (e.name === 'QuotaExceededError' ||
+                                e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                                if (callback) {
+                                    callback(null, e);
+                                }
+
+                                reject(e);
+                            }
+                        }
 
                         if (callback) {
                             callback(originalValue);
@@ -1386,7 +1433,8 @@ requireModule('promise/polyfill').polyfill();
         removeItem: removeItem,
         clear: clear,
         length: length,
-        key: key
+        key: key,
+        keys: keys
     };
 
     if (typeof define === 'function' && define.amd) {
@@ -1416,18 +1464,13 @@ requireModule('promise/polyfill').polyfill();
     // verbose ways of binary <-> string data storage.
     var BASE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-    var Promise = this.Promise;
+    // Promises!
+    var Promise = (typeof module !== 'undefined' && module.exports) ?
+                  require('promise') : this.Promise;
+
     var openDatabase = this.openDatabase;
     var db = null;
-    var dbInfo = {
-        description: '',
-        name: 'localforage',
-        // Default DB size is _JUST UNDER_ 5MB, as it's the highest size we can use
-        // without a prompt.
-        size: 4980736,
-        storeName: 'keyvaluepairs',
-        version: '1.0'
-    };
+    var dbInfo = {};
 
     var SERIALIZED_MARKER = '__lfsc__:';
     var SERIALIZED_MARKER_LENGTH = SERIALIZED_MARKER.length;
@@ -1452,25 +1495,30 @@ requireModule('promise/polyfill').polyfill();
     }
 
     // Open the WebSQL database (automatically creates one if one didn't
-    // previously exist), using any options set in window.localForageConfig.
+    // previously exist), using any options set in the config.
     function _initStorage(options) {
+        var _this = this;
+
         if (options) {
-            for (var i in dbInfo) {
-                if (options[i] !== undefined) {
-                    dbInfo[i] = typeof(options[i]) !== 'string' ? options[i].toString() : options[i];
-                }
+            for (var i in options) {
+                dbInfo[i] = typeof(options[i]) !== 'string' ? options[i].toString() : options[i];
             }
         }
 
         return new Promise(function(resolve) {
             // Open the database; the openDatabase API will automatically
             // create it for us if it doesn't exist.
-            db = openDatabase(dbInfo.name, dbInfo.version, dbInfo.description,
-                              dbInfo.size);
+            try {
+                db = openDatabase(dbInfo.name, dbInfo.version,
+                                  dbInfo.description, dbInfo.size);
+            } catch (e) {
+                return _this.setDriver('localStorageWrapper').then(resolve);
+            }
 
             // Create our key/value table if it doesn't exist.
-            db.transaction(function (t) {
-                t.executeSql('CREATE TABLE IF NOT EXISTS ' + dbInfo.storeName + ' (id INTEGER PRIMARY KEY, key unique, value)', [], function() {
+            db.transaction(function(t) {
+                t.executeSql('CREATE TABLE IF NOT EXISTS ' + dbInfo.storeName +
+                             ' (id INTEGER PRIMARY KEY, key unique, value)', [], function() {
                     resolve();
                 }, null);
             });
@@ -1479,10 +1527,11 @@ requireModule('promise/polyfill').polyfill();
 
     function getItem(key, callback) {
         var _this = this;
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                db.transaction(function (t) {
-                    t.executeSql('SELECT * FROM ' + dbInfo.storeName + ' WHERE key = ? LIMIT 1', [key], function (t, results) {
+                db.transaction(function(t) {
+                    t.executeSql('SELECT * FROM ' + dbInfo.storeName +
+                                 ' WHERE key = ? LIMIT 1', [key], function(t, results) {
                         var result = results.rows.length ? results.rows.item(0).value : null;
 
                         // Check to see if this is serialized content we need to
@@ -1496,7 +1545,13 @@ requireModule('promise/polyfill').polyfill();
                         }
 
                         resolve(result);
-                    }, null);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(null, error);
+                        }
+
+                        reject(error);
+                    });
                 });
             });
         });
@@ -1516,18 +1571,41 @@ requireModule('promise/polyfill').polyfill();
                 // Save the original value to pass to the callback.
                 var originalValue = value;
 
-                _serialize(value, function setItemserializeValueCallback(error, value) {
+                _serialize(value, function(value, error) {
                     if (error) {
                         reject(error);
                     } else {
-                        db.transaction(function (t) {
-                            t.executeSql('INSERT OR REPLACE INTO ' + dbInfo.storeName + ' (key, value) VALUES (?, ?)', [key, value], function() {
+                        db.transaction(function(t) {
+                            t.executeSql('INSERT OR REPLACE INTO ' + dbInfo.storeName +
+                                         ' (key, value) VALUES (?, ?)', [key, value], function() {
                                 if (callback) {
                                     callback(originalValue);
                                 }
 
                                 resolve(originalValue);
-                            }, null);
+                            }, function(t, error) {
+                                if (callback) {
+                                    callback(null, error);
+                                }
+
+                                reject(error);
+                            });
+                        }, function(sqlError) { // The transaction failed; check
+                                                // to see if it's a quota error.
+                            if (sqlError.code === sqlError.QUOTA_ERR) {
+                                // We reject the callback outright for now, but
+                                // it's worth trying to re-run the transaction.
+                                // Even if the user accepts the prompt to use
+                                // more storage on Safari, this error will
+                                // be called.
+                                //
+                                // TODO: Try to re-run the transaction.
+                                if (callback) {
+                                    callback(null, sqlError);
+                                }
+
+                                reject(sqlError);
+                            }
                         });
                     }
                 });
@@ -1537,16 +1615,23 @@ requireModule('promise/polyfill').polyfill();
 
     function removeItem(key, callback) {
         var _this = this;
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                db.transaction(function (t) {
-                    t.executeSql('DELETE FROM ' + dbInfo.storeName + ' WHERE key = ?', [key], function() {
+                db.transaction(function(t) {
+                    t.executeSql('DELETE FROM ' + dbInfo.storeName +
+                                 ' WHERE key = ?', [key], function() {
                         if (callback) {
                             callback();
                         }
 
                         resolve();
-                    }, null);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(error);
+                        }
+
+                        reject(error);
+                    });
                 });
             });
         });
@@ -1556,16 +1641,22 @@ requireModule('promise/polyfill').polyfill();
     // TODO: Find out if this resets the AUTO_INCREMENT number.
     function clear(callback) {
         var _this = this;
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                db.transaction(function (t) {
+                db.transaction(function(t) {
                     t.executeSql('DELETE FROM ' + dbInfo.storeName, [], function() {
                         if (callback) {
                             callback();
                         }
 
                         resolve();
-                    }, null);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(error);
+                        }
+
+                        reject(error);
+                    });
                 });
             });
         });
@@ -1575,11 +1666,12 @@ requireModule('promise/polyfill').polyfill();
     // localForage.
     function length(callback) {
         var _this = this;
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                db.transaction(function (t) {
+                db.transaction(function(t) {
                     // Ahhh, SQL makes this one soooooo easy.
-                    t.executeSql('SELECT COUNT(key) as c FROM ' + dbInfo.storeName, [], function (t, results) {
+                    t.executeSql('SELECT COUNT(key) as c FROM ' +
+                                 dbInfo.storeName, [], function(t, results) {
                         var result = results.rows.item(0).c;
 
                         if (callback) {
@@ -1587,7 +1679,13 @@ requireModule('promise/polyfill').polyfill();
                         }
 
                         resolve(result);
-                    }, null);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(null, error);
+                        }
+
+                        reject(error);
+                    });
                 });
             });
         });
@@ -1602,10 +1700,11 @@ requireModule('promise/polyfill').polyfill();
     // TODO: Don't change ID on `setItem()`.
     function key(n, callback) {
         var _this = this;
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             _this.ready().then(function() {
-                db.transaction(function (t) {
-                    t.executeSql('SELECT key FROM ' + dbInfo.storeName + ' WHERE id = ? LIMIT 1', [n + 1], function (t, results) {
+                db.transaction(function(t) {
+                    t.executeSql('SELECT key FROM ' + dbInfo.storeName +
+                                 ' WHERE id = ? LIMIT 1', [n + 1], function(t, results) {
                         var result = results.rows.length ? results.rows.item(0).key : null;
 
                         if (callback) {
@@ -1613,7 +1712,44 @@ requireModule('promise/polyfill').polyfill();
                         }
 
                         resolve(result);
-                    }, null);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(null, error);
+                        }
+
+                        reject(error);
+                    });
+                });
+            });
+        });
+    }
+
+    function keys(callback) {
+        var _this = this;
+        return new Promise(function(resolve, reject) {
+            _this.ready().then(function() {
+                db.transaction(function(t) {
+                    t.executeSql('SELECT key FROM ' + dbInfo.storeName, [],
+                                 function(t, results) {
+                        var length = results.rows.length;
+                        var keys = [];
+
+                        for (var i = 0; i < length; i++) {
+                            keys.push(results.rows.item(i).key);
+                        }
+
+                        if (callback) {
+                            callback(keys);
+                        }
+
+                        resolve(keys);
+                    }, function(t, error) {
+                        if (callback) {
+                            callback(null, error);
+                        }
+
+                        reject(error);
+                    });
                 });
             });
         });
@@ -1774,9 +1910,7 @@ requireModule('promise/polyfill').polyfill();
                 }
             }
 
-            var str = _bufferToString(buffer);
-
-            callback(null, marker + str);
+            callback(marker + _bufferToString(buffer));
         } else if (valueString === "[object Blob]") {
             // Conver the blob to a binaryArray and then to a string.
             var fileReader = new FileReader();
@@ -1784,18 +1918,19 @@ requireModule('promise/polyfill').polyfill();
             fileReader.onload = function() {
                 var str = _bufferToString(this.result);
 
-                callback(null, SERIALIZED_MARKER + TYPE_BLOB + str);
+                callback(SERIALIZED_MARKER + TYPE_BLOB + str);
             };
 
             fileReader.readAsArrayBuffer(value);
         } else {
             try {
-                callback(null, JSON.stringify(value));
+                callback(JSON.stringify(value));
             } catch (e) {
-                if (window.console && window.console.error) {
-                    window.console.error("Couldn't convert value into a JSON string: ", value);
+                if (this.console && this.console.error) {
+                    this.console.error("Couldn't convert value into a JSON string: ", value);
                 }
-                callback(e);
+
+                callback(null, e);
             }
         }
     }
@@ -1808,7 +1943,8 @@ requireModule('promise/polyfill').polyfill();
         removeItem: removeItem,
         clear: clear,
         length: length,
-        key: key
+        key: key,
+        keys: keys
     };
 
     if (typeof define === 'function' && define.amd) {
@@ -1825,7 +1961,8 @@ requireModule('promise/polyfill').polyfill();
     'use strict';
 
     // Promises!
-    var Promise = this.Promise;
+    var Promise = (typeof module !== 'undefined' && module.exports) ?
+                  require('promise') : this.Promise;
 
     // Avoid those magic constants!
     var MODULE_TYPE_DEFINE = 1;
@@ -1849,6 +1986,10 @@ requireModule('promise/polyfill').polyfill();
                     this.mozIndexedDB || this.OIndexedDB ||
                     this.msIndexedDB;
 
+    var supportsIndexedDB = indexedDB &&
+                            indexedDB.open('_localforage_spec_test', 1)
+                                     .onupgradeneeded === null;
+
     // Check for WebSQL.
     var openDatabase = this.openDatabase;
 
@@ -1860,7 +2001,43 @@ requireModule('promise/polyfill').polyfill();
         LOCALSTORAGE: 'localStorageWrapper',
         WEBSQL: 'webSQLStorage',
 
-        config: {},
+        _config: {
+            description: '',
+            name: 'localforage',
+            // Default DB size is _JUST UNDER_ 5MB, as it's the highest size
+            // we can use without a prompt.
+            size: 4980736,
+            storeName: 'keyvaluepairs',
+            version: 1.0
+        },
+
+        // Set any config values for localForage; can be called anytime before
+        // the first API call (e.g. `getItem`, `setItem`).
+        // We loop through options so we don't overwrite existing config
+        // values.
+        config: function(options) {
+            // If the options argument is an object, we use it to set values.
+            // Otherwise, we return either a specified config value or all
+            // config values.
+            if (typeof(options) === 'object') {
+                // If localforage is ready and fully initialized, we can't set
+                // any new configuration values. Instead, we return an error.
+                if (this._ready) {
+                    return new Error("Can't call config() after localforage " +
+                                     "has been used.");
+                }
+
+                for (var i in options) {
+                    this._config[i] = options[i];
+                }
+
+                return true;
+            } else if (typeof(options) === 'string') {
+                return this._config[options];
+            } else {
+                return this._config;
+            }
+        },
 
         driver: function() {
             return this._driver || null;
@@ -1870,7 +2047,8 @@ requireModule('promise/polyfill').polyfill();
 
         setDriver: function(driverName, callback) {
             var driverSet = new Promise(function(resolve, reject) {
-                if ((!indexedDB && driverName === localForage.INDEXEDDB) ||
+                if ((!supportsIndexedDB &&
+                     driverName === localForage.INDEXEDDB) ||
                     (!openDatabase && driverName === localForage.WEBSQL)) {
                     reject(localForage);
 
@@ -1895,13 +2073,13 @@ requireModule('promise/polyfill').polyfill();
                     var driver;
                     switch (driverName) {
                         case localForage.INDEXEDDB:
-                            driver = require('localforage/src/drivers/indexeddb');
+                            driver = require('./drivers/indexeddb');
                             break;
                         case localForage.LOCALSTORAGE:
-                            driver = require('localforage/src/drivers/localstorage');
+                            driver = require('./drivers/localstorage');
                             break;
                         case localForage.WEBSQL:
-                            driver = require('localforage/src/drivers/websql');
+                            driver = require('./drivers/websql');
                     }
 
                     localForage._extend(driver);
@@ -1919,7 +2097,7 @@ requireModule('promise/polyfill').polyfill();
 
         ready: function(callback) {
             if (this._ready === null) {
-                this._ready = this._initStorage(this.config);
+                this._ready = this._initStorage(this._config);
             }
 
             this._ready.then(callback, callback);
@@ -1943,7 +2121,7 @@ requireModule('promise/polyfill').polyfill();
     // as the name of the database because it's not the one we'll operate on,
     // but it's useful to make sure its using the right spec.
     // See: https://github.com/mozilla/localForage/issues/128
-    if (indexedDB && indexedDB.open('_localforage_spec_test', 1).onupgradeneeded === null ) {
+    if (supportsIndexedDB) {
         storageLibrary = localForage.INDEXEDDB;
     } else if (openDatabase) { // WebSQL is available, so we'll use that.
         storageLibrary = localForage.WEBSQL;
