@@ -6,6 +6,7 @@ requirejs.config({
         'jquery' : 'lib/jquery-2.1.0.min',
         'snap' : 'lib/snap.svg-min',
         'colorpicker' : 'lib/farbtastic',
+        'sortable' : 'lib/jquery.sortable',
         'FileSaver' : 'lib/FileSaver',
         'localforage' : 'lib/localforage',
         'underscore' : 'lib/underscore-min',

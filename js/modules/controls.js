@@ -9,6 +9,7 @@ define('controls', function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     require('colorpicker');
+    require('sortable');
     var canvas = require('canvas');
 
     // ------------------------------------------------------------------------- //
@@ -540,6 +541,11 @@ define('controls', function(require) {
             makeStrokeHTML(stroke);
         });
 
+        // draggable
+        makeStrokesSortable();
+        // events
+        $strokeList.on('sortupdate', rebuildStrokeSettings);
+
     }
 
 
@@ -572,10 +578,16 @@ define('controls', function(require) {
         });
     }
 
+    function makeStrokesSortable() {
+        $strokeList.sortable('destroy');
+        $strokeList.sortable();
+    }
+
 
 
     var strokeTemplate = [
         '<li class="stroke">',
+            // '<div class="stroke__handle"></div>',
             '<div class="colorpicker-holder" data-color-picker></div>',
             '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
             '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
@@ -608,6 +620,7 @@ define('controls', function(require) {
         var newStroke = globals.settings.strokes[newStrokeIndex];
 
         makeStrokeHTML(newStroke);
+        makeStrokesSortable();
 
     }
 
@@ -717,6 +730,9 @@ define('controls', function(require) {
         _.each(globals.settings.strokes, function(stroke, index) {
             makeStrokeHTML(stroke);
         });
+
+        // draggable
+        makeStrokesSortable();
 
     }
 
