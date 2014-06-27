@@ -763,10 +763,20 @@ input {
 
 .stroke {
   margin: 0 -20px;
-  padding: 10px 20px;
+  padding: 10px 20px 10px 20px;
   position: relative;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stroke__handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: move;
 }
 
 .add-stroke {
@@ -777,6 +787,20 @@ input {
   position: absolute;
   right: -1px;
   top: -2px;
+}
+
+.sortable-placeholder {
+  display: block;
+  height: 3em;
+  margin: 0 -20px;
+  padding: 10px 20px;
+  position: relative;
+  background-color: #fff;
+}
+
+.sortable-dragging {
+  background-color: #ccc;
+  cursor: move;
 }
 
 .menu {
