@@ -13,8 +13,7 @@ requirejs.config({
         'canvas' : 'modules/canvas',
         'controls' : 'modules/controls',
         'menu' : 'modules/menu',
-        'Line' : 'modules/Line',
-        'loopalo' : 'loopalo'
+        'globals' : 'modules/globals',
     },
     shim : {
         // jquery plugins
@@ -40,7 +39,5 @@ define('main', function(require) {
     require('canvas');
     require('controls');
     require('menu');
-
-    require('loopalo');
 
 });
