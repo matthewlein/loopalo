@@ -27,7 +27,7 @@ define('controls', function(require) {
         var line;
 
         // draw all the lines
-        for (var j = 0; j < globals.settings.lineCount; j++) {
+        for (var j = 0; j < globals.doc.lineCount; j++) {
             line = new canvas.Line();
             line.drawPath();
         }
@@ -428,12 +428,12 @@ define('controls', function(require) {
 
         // line count field
         var $lineCountInput = $('#line-count');
-        $lineCountInput.val(globals.settings.lineCount);
+        $lineCountInput.val(globals.doc.lineCount);
         $lineCountInput.on('change', function() {
             var $this = $(this);
             var val = $this.val();
 
-            globals.settings.lineCount = val;
+            globals.doc.lineCount = val;
         });
 
         // opacity slider field
@@ -712,7 +712,7 @@ define('controls', function(require) {
 
         // line count field
         var $lineCountInput = $('#line-count');
-        $lineCountInput.val(globals.settings.lineCount);
+        $lineCountInput.val(globals.doc.lineCount);
 
         // opacity slider field
         var $opacityRange = $('#line-opacity');

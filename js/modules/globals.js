@@ -22,11 +22,11 @@ define('globals', function(require) {
         mode : 'draw',
         // page bg color
         bgColor : '#f3f5df',
+        // number of lines drawn
+        lineCount : 30
     };
 
     globals.settings = {
-        // number of lines drawn
-        lineCount : 30,
         // how long each line is
         lineLength : 70,
         // how big are loops and straights
