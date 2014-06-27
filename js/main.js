@@ -13,18 +13,22 @@ requirejs.config({
         'canvas' : 'modules/canvas',
         'controls' : 'modules/controls',
         'menu' : 'modules/menu',
-        'Line' : 'modules/Line'
+        'Line' : 'modules/Line',
+        'loopalo' : 'loopalo'
     },
     shim : {
         // jquery plugins
-        'colorpicker' : ['jquery']
+        'colorpicker' : ['jquery'],
         // non AMD
-        // 'underscore': {
-        //     exports: '_'
-        // },
-        // 'FileSaver' : {
-        //     exports: 'saveAs'
-        // }
+        'snap' : {
+            exports: 'Snap'
+        },
+        'underscore': {
+            exports: '_'
+        },
+        'FileSaver' : {
+            exports: 'saveAs'
+        }
     }
 });
 
@@ -36,5 +40,7 @@ define('main', function(require) {
     require('canvas');
     require('controls');
     require('menu');
+
+    require('loopalo');
 
 });

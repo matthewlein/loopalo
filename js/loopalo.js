@@ -1,3 +1,11 @@
+define('loopalo', function(require) {
+
+    var Snap = require('snap');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var localforage = require('localforage');
+    require('colorpicker');
+
 /* global Modernizr */
 /* global Snap */
 'use strict';
@@ -1274,3 +1282,6 @@ function init() {
 }
 
 init();
+
+
+});
