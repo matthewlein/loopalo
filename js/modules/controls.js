@@ -537,11 +537,13 @@ define('controls', function(require) {
             $bgColorPickerHolder.show();
         }).on('blur', function() {
             $bgColorPickerHolder.hide();
+        }).on('change keyup', function() {
+            $bgColorPicker.setColor(this.value);
         });
 
 
         // make strokes
-        _.each(globals.settings.strokes, function(stroke, index) {
+        _.each(globals.settings.strokes, function(stroke) {
             makeStrokeHTML(stroke);
         });
 
@@ -669,6 +671,8 @@ define('controls', function(require) {
             $colorPickerHolder.show();
         }).on('blur', function() {
             $colorPickerHolder.hide();
+        }).on('change keyup', function() {
+            $colorPicker.setColor(this.value);
         });
 
         // delete button
