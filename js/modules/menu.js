@@ -79,11 +79,41 @@ define('menu', function(require) {
     // Settings Save
     //
     var $saveSettingsBtn = $('#save-settings');
-    $saveSettingsBtn.on('click', saveSettings);
+    $saveSettingsBtn.on('click', saveDialogOpen);
+
+    var $saveDialogCancel = $('#save-dialog__cancel');
+    $saveDialogCancel.on('click', saveDialogClose);
+
+    var $saveDialog = $('#save-dialog');
+    var saveDialogHideClass = 'save-dialog--hidden';
+
+    var $saveDialogName = $('#save-dialog__name');
+    $saveDialogName.on('keyup change', function() {
+        if ( this.value.length ) {
+            $saveDialogSave.prop('disabled', false);
+        } else {
+            $saveDialogSave.prop('disabled', true);
+        }
+    });
+
+    var $saveDialogSave = $('#save-dialog__save');
+    $saveDialogSave.on('click', saveSettings);
+
+
+    function saveDialogOpen() {
+        $saveDialog.removeClass(saveDialogHideClass);
+    }
+
+    function saveDialogClose() {
+        $saveDialog.addClass(saveDialogHideClass);
+        $saveDialogName.val('');
+        $saveDialogSave.prop('disabled', true);
+    }
+
 
     function saveSettings() {
 
-        var name = prompt('Name:');
+        var name = $saveDialogName.val();
 
         savedSettings.push({
             name : name,
@@ -94,6 +124,7 @@ define('menu', function(require) {
             $li.data('name', name);
             $savedSettingsUI.append($li);
             clearSettingSelection();
+            saveDialogClose();
         });
     }
 

@@ -15,12 +15,74 @@
 .menu-list {}
 .menu__item {
     margin-bottom: 20px;
+    position: relative;
 
     &:last-child {
         margin-bottom: 0;
     }
 }
 
+
+.arrow:after,
+.arrow:before {
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.arrow--w:after,
+.arrow--w:before {
+    right: 100%;
+    top: 50%;
+}
+
+$arrow-size : 12px;
+$arrow-color : #ccc;
+
+.arrow:after {
+    border-right-color: $arrow-color;
+    border-width: $arrow-size;
+    margin-top: -$arrow-size;
+}
+
+
+// --------------------------------------------------------------------- //
+// Specifics
+// --------------------------------------------------------------------- //
+
+
+//
+// setting save dialog
+//
+
+.save-dialog {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    padding: 20px;
+    margin-left: $arrow-size/2;
+    background-color: #ccc;
+    border-radius: $button-radius;
+    @include transition(all 300ms ease-out);
+    @include translateY(-50%);
+    @include box-shadow(0 0 20px rgba( 0, 0, 0, 0.4 ) );
+}
+    .save-dialog--hidden {
+        opacity: 0;
+        pointer-events: none;
+        margin-left: 0;
+    }
+
+.save-dialog__name {
+    margin-bottom: 10px;
+}
+
+
+//
+// setting list
+//
 .settings-list {
     background-color: #fff;
 }
@@ -32,3 +94,4 @@
 .settings-list__item--active {
     background-color: #ddd;
 }
+

@@ -102,7 +102,6 @@
             <h2>Todo:</h2>
             <ul>
                 <li>design</li>
-                <li>better save settings popup</li>
                 <li>juice up effects/transitions</li>
                 <li>random/inspire mode</li>
                 <li>export png?</li>
@@ -122,6 +121,12 @@
                         <button class="button button--save-settings button--full" id="save-settings">
                             <i class="icon icon--settings"></i>Save Settings
                         </button>
+                        <section class="save-dialog save-dialog--hidden arrow arrow--w" id="save-dialog">
+                            <label for="save-dialog__name">Name</label>
+                            <input type="text" class="save-dialog__name" id="save-dialog__name">
+                            <button class="button button--cancel button--1_2 button--group button--group--left" id="save-dialog__cancel">Cancel</button>
+                            <button class="button button--save button--1_2 button--group button--group--right" id="save-dialog__save" disabled>Save</button>
+                        </section>
                     </li>
                     <li class="menu__item">
                         <ul class="settings-list" id="settings-list">
