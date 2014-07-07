@@ -14,6 +14,9 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
 
+        // add excludes to the grunt object
+        excludes : excludes,
+
         // deletes dist/
         clean : ['dist/'],
 
@@ -118,19 +121,19 @@ module.exports = function(grunt) {
             html: {
                 files: [
                     '**/*.html',
-                    excludes[0]
+                    '<%= excludes %>'
                 ]
             },
             js: {
                 files: [
                     '**/*.js',
-                    excludes[0]
+                    '<%= excludes %>'
                 ]
             },
             css: {
                 files: [
                     'css/*.css',
-                    excludes[0]
+                    '<%= excludes %>'
                 ]
             },
             // don't livereload sass because we livereload the css
@@ -140,7 +143,7 @@ module.exports = function(grunt) {
                 },
                 files: [
                     'sass/*.scss',
-                    excludes[0]
+                    '<%= excludes %>'
                 ],
                 // compile on change
                 tasks: ['sass']
