@@ -763,31 +763,121 @@ input {
 }
 
 .stroke {
-  margin: 0 -20px;
-  padding: 10px 20px 10px 20px;
   position: relative;
+  margin: 0 -20px;
+}
+.stroke:before, .stroke:after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.stroke:before {
+  top: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+.stroke:after {
+  bottom: 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.stroke__handle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 20px;
-  background-color: rgba(0, 0, 0, 0.1);
-  cursor: move;
+.stroke__wrapper {
+  overflow: hidden;
+  position: relative;
+  padding: 10px 20px 10px 20px;
+  -moz-animation-duration: 300ms;
+  -webkit-animation-duration: 300ms;
+  animation-duration: 300ms;
+  -moz-animation-timing-function: ease-out;
+  -webkit-animation-timing-function: ease-out;
+  animation-timing-function: ease-out;
+}
+.stroke__wrapper.stroke--added {
+  -moz-animation-name: strokeAdd;
+  -webkit-animation-name: strokeAdd;
+  animation-name: strokeAdd;
+}
+.stroke__wrapper.stroke--deleted {
+  -moz-animation-name: strokeRemove;
+  -webkit-animation-name: strokeRemove;
+  animation-name: strokeRemove;
 }
 
+@-moz-keyframes strokeAdd {
+  from {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  to {
+    max-height: 52px;
+  }
+}
+@-webkit-keyframes strokeAdd {
+  from {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  to {
+    max-height: 52px;
+  }
+}
+@keyframes strokeAdd {
+  from {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  to {
+    max-height: 52px;
+  }
+}
+@-moz-keyframes strokeRemove {
+  from {
+    max-height: 52px;
+  }
+
+  to {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+@-webkit-keyframes strokeRemove {
+  from {
+    max-height: 52px;
+  }
+
+  to {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+@keyframes strokeRemove {
+  from {
+    max-height: 52px;
+  }
+
+  to {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
 .add-stroke {
   margin-bottom: 10px;
 }
 
 .stroke-delete {
   position: absolute;
-  right: -1px;
-  top: -2px;
+  right: -2px;
+  top: -1px;
 }
 
 .sortable-placeholder {

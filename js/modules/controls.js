@@ -10,6 +10,7 @@ define('controls', function(require) {
     var _ = require('underscore');
     require('colorpicker');
     require('sortable');
+    require('animationDuration');
     var canvas = require('canvas');
     var Line = require('Line');
 
@@ -595,14 +596,16 @@ define('controls', function(require) {
         '<li class="stroke">',
             // '<div class="stroke__handle"></div>',
             '<div class="colorpicker-holder" data-color-picker></div>',
-            '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
-            '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
-            '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
-                '<option value="round">Round</option>',
-                '<option value="square">Square</option>',
-                '<option value="butt">Butt</option>',
-            '</select>',
-            '<button class="stroke-delete" data-stroke-delete><i class="icon icon--solo icon--close"></i></button>',
+            '<div class="stroke__wrapper">',
+                '<input type="text" class="stroke-color input--color" value="{{color}}" data-stroke-color="{{color}}">',
+                '<input type="number" class="stroke-width" value="{{width}}" data-stroke-width="{{width}}">',
+                '<select name="" id="" class="stroke-cap" data-stroke-cap="{{cap}}">',
+                    '<option value="round">Round</option>',
+                    '<option value="square">Square</option>',
+                    '<option value="butt">Butt</option>',
+                '</select>',
+                '<button class="stroke-delete" data-stroke-delete><i class="icon icon--solo icon--close"></i></button>',
+            '</div>',
         '</li>'
     // join with newline or no??? hmmm
     ].join('\n');
@@ -632,6 +635,8 @@ define('controls', function(require) {
 
     function makeStrokeHTML(stroke) {
 
+        // @TODO this should probably not append as part of the function, just process data to HTML
+
         var width = stroke.width;
         var color = stroke.color;
         var cap = stroke.cap;
@@ -643,9 +648,10 @@ define('controls', function(require) {
 
         // make the HTML findable
         var $strokeHTML = $(strokeHTML);
+        var $strokeWrapper = $strokeHTML.find('.stroke__wrapper');
+
         // select the correct option
         $strokeHTML.find('option[value="' + cap + '"]').prop('selected', true);
-
 
         // wrapper for the picker
         var $colorPickerHolder = $strokeHTML.find('[data-color-picker]');
@@ -679,8 +685,16 @@ define('controls', function(require) {
         var $deleteStroke = $strokeHTML.find('[data-stroke-delete]');
         $deleteStroke.on('click', function() {
             if ( $('#strokes-list').children().length > 1 ) {
-                $strokeHTML.remove();
-                rebuildStrokeSettings();
+
+                $strokeWrapper.addClass('stroke--deleted');
+                var animDuration = $strokeWrapper.animationDuration() * 0.95;
+
+                setTimeout(function() {
+                    $strokeWrapper.removeClass('stroke--deleted');
+                    $strokeHTML.remove();
+                    rebuildStrokeSettings();
+                }, animDuration);
+
             }
         });
 
@@ -704,7 +718,17 @@ define('controls', function(require) {
 
         });
 
+        // add it to the list
         $strokeList.append($strokeHTML);
+
+        // make the transition fancy
+        $strokeWrapper.addClass('stroke--added');
+
+        var animDuration = $strokeWrapper.animationDuration();
+        setTimeout(function() {
+            $strokeWrapper.removeClass('stroke--added');
+        }, animDuration);
+
     }
 
 

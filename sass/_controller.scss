@@ -180,21 +180,75 @@ input {
 //
 
 .stroke {
-    margin: 0 -20px;
-    padding: 10px 20px 10px 20px;
     position: relative;
-    border-top: 1px solid rgba( 255, 255, 255, 0.3 );
-    border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
+    margin: 0 -20px;
+
+    &:before,
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+    &:before {
+        top: 0;
+        border-top: 1px solid rgba( 255, 255, 255, 0.3 );
+    }
+    &:after {
+        bottom: 0;
+        border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
+    }
 }
-.stroke__handle {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 20px;
-    background-color: rgba( 0, 0, 0, 0.1 );
-    cursor: move;
+
+.stroke__wrapper {
+    overflow: hidden;
+    position: relative;
+    padding: 10px 20px 10px 20px;
+
+    @include animation-duration( 300ms );
+    @include animation-timing-function( ease-out );
+
+    &.stroke--added {
+        @include animation-name(strokeAdd);
+    }
+    &.stroke--deleted {
+        @include animation-name(strokeRemove);
+    }
 }
+
+
+@include keyframes(strokeAdd) {
+    from {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        max-height: 52px;
+    }
+};
+@include keyframes(strokeRemove) {
+    from {
+        max-height: 52px;
+    }
+    to {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+};
+
+
+// .stroke__handle {
+//     position: absolute;
+//     left: 0;
+//     top: 0;
+//     height: 100%;
+//     width: 20px;
+//     background-color: rgba( 0, 0, 0, 0.1 );
+//     cursor: move;
+// }
 
 .add-stroke {
     margin-bottom: 10px;
@@ -202,8 +256,8 @@ input {
 
 .stroke-delete {
     position: absolute;
-    right: -1px;
-    top: -2px;
+    right: -2px;
+    top: -1px;
 }
 
 // draggable
