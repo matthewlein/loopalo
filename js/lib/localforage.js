@@ -2154,7 +2154,7 @@ requireModule('promise/polyfill').polyfill();
     // We allow localForage to be declared as a module or as a library
     // available without AMD/require.js.
     if (moduleType === MODULE_TYPE_DEFINE) {
-        define(function() {
+        define('localforage', function() {
             return localForage;
         });
     } else if (moduleType === MODULE_TYPE_EXPORT) {

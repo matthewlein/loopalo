@@ -5,7 +5,7 @@ requirejs.config({
     paths: {
         // plugins
         'jquery' : 'lib/jquery-2.1.0.min',
-        'snap' : 'lib/snap.svg-min',
+        'snap' : 'lib/snap.svg',
         'colorpicker' : 'lib/farbtastic',
         'sortable' : 'lib/jquery.sortable',
         'animationDuration' : 'lib/jquery.animationDuration',

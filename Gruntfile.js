@@ -14,9 +14,6 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
 
-        // add excludes to the grunt object
-        excludes : excludes,
-
         // deletes dist/
         clean : ['dist/'],
 
@@ -32,6 +29,34 @@ module.exports = function(grunt) {
                 ]
             }
         },
+
+        requirejs : {
+            prod : {
+                options : {
+                    baseUrl: 'dist/js',
+                    mainConfigFile: 'dist/js/main.js',
+                    name: 'almond',
+                    include: 'main',
+                    insertRequire : ['main'],
+                    out: 'dist/js/main.<%= grunt.config.get("now") %>.js'
+                }
+            }
+        },
+
+        // process the index page
+        processhtml : {
+            options : {
+                data : {
+                    now : '<%= grunt.config.get("now") %>'
+                }
+            },
+            prod : {
+                files: {
+                    'dist/index.html': ['dist/index.html']
+                }
+            },
+        },
+
 
         // stores secrets off source control
         superSecrets: grunt.file.readJSON('superSecrets.json'),
@@ -93,19 +118,19 @@ module.exports = function(grunt) {
             html: {
                 files: [
                     '**/*.html',
-                    '<%= excludes %>'
+                    excludes[0]
                 ]
             },
             js: {
                 files: [
                     '**/*.js',
-                    '<%= excludes %>'
+                    excludes[0]
                 ]
             },
             css: {
                 files: [
                     'css/*.css',
-                    '<%= excludes %>'
+                    excludes[0]
                 ]
             },
             // don't livereload sass because we livereload the css
@@ -115,7 +140,7 @@ module.exports = function(grunt) {
                 },
                 files: [
                     'sass/*.scss',
-                    '<%= excludes %>'
+                    excludes[0]
                 ],
                 // compile on change
                 tasks: ['sass']
@@ -130,12 +155,37 @@ module.exports = function(grunt) {
         'watch'
     ]);
 
+
+    grunt.registerTask('build', [], function() {
+        grunt.loadNpmTasks('grunt-contrib-requirejs');
+        grunt.loadNpmTasks('grunt-processhtml');
+        grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-clean');
+
+        // set now variable for script versioning
+        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+        grunt.task.run('clean', 'copy', 'requirejs', 'processhtml');
+    });
+
+
+    grunt.registerTask('copee', [], function() {
+        grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-clean');
+        grunt.task.run('clean', 'copy');
+    });
+
     // publish live
     grunt.registerTask('publish', [], function() {
         grunt.loadNpmTasks('grunt-contrib-clean');
         grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-requirejs');
+        grunt.loadNpmTasks('grunt-processhtml');
         grunt.loadNpmTasks('grunt-rsync');
-        grunt.task.run('copy', 'rsync', 'clean');
+
+        // set now variable for script versioning
+        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+
+        grunt.task.run('copy', 'requirejs', 'processhtml', 'rsync', 'clean');
     });
 
 };
