@@ -99,6 +99,7 @@
 
             </section>
 
+            <!-- build:remove:prod -->
             <h2>Todo:</h2>
             <ul>
                 <li>design</li>
@@ -109,6 +110,7 @@
                 <li>export png?</li>
                 <li>hide/show stroke</li>
             </ul>
+            <!-- /build -->
 
         </section>
 
@@ -147,7 +149,13 @@
 
 </body>
 
+<!-- build:remove:prod -->
 <script src="js/require.js" data-main="js/main.js"></script>
+<!-- /build -->
+
+<!-- build:template:prod
+<script src="js/main.<%= now %>.js"></script>
+/build -->
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

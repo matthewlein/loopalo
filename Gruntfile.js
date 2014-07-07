@@ -30,6 +30,34 @@ module.exports = function(grunt) {
             }
         },
 
+        requirejs : {
+            prod : {
+                options : {
+                    baseUrl: 'dist/js',
+                    mainConfigFile: 'dist/js/main.js',
+                    name: 'almond',
+                    include: 'main',
+                    insertRequire : ['main'],
+                    out: 'dist/js/main.<%= grunt.config.get("now") %>.js'
+                }
+            }
+        },
+
+        // process the index page
+        processhtml : {
+            options : {
+                data : {
+                    now : '<%= grunt.config.get("now") %>'
+                }
+            },
+            prod : {
+                files: {
+                    'dist/index.html': ['dist/index.html']
+                }
+            },
+        },
+
+
         // stores secrets off source control
         superSecrets: grunt.file.readJSON('superSecrets.json'),
 
@@ -126,12 +154,38 @@ module.exports = function(grunt) {
         'connect',
         'watch'
     ]);
+
+
+    grunt.registerTask('build', [], function() {
+        grunt.loadNpmTasks('grunt-contrib-requirejs');
+        grunt.loadNpmTasks('grunt-processhtml');
+        grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-clean');
+
+        // set now variable for script versioning
+        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+        grunt.task.run('clean', 'copy', 'requirejs', 'processhtml');
+    });
+
+
+    grunt.registerTask('copee', [], function() {
+        grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-clean');
+        grunt.task.run('clean', 'copy');
+    });
+
     // publish live
     grunt.registerTask('publish', [], function() {
         grunt.loadNpmTasks('grunt-contrib-clean');
         grunt.loadNpmTasks('grunt-contrib-copy');
+        grunt.loadNpmTasks('grunt-contrib-requirejs');
+        grunt.loadNpmTasks('grunt-processhtml');
         grunt.loadNpmTasks('grunt-rsync');
-        grunt.task.run('copy', 'rsync', 'clean');
+
+        // set now variable for script versioning
+        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+
+        grunt.task.run('copy', 'requirejs', 'processhtml', 'rsync', 'clean');
     });
 
 };
