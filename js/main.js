@@ -1,5 +1,6 @@
 requirejs.config({
     baseUrl: '/js',
+    // probably not needed
     waitSeconds: 45,
     paths: {
         // plugins
@@ -14,6 +15,7 @@ requirejs.config({
         'canvas' : 'modules/canvas',
         'controls' : 'modules/controls',
         'menu' : 'modules/menu',
+        'Line' : 'modules/Line',
         'globals' : 'modules/globals',
     },
     shim : {

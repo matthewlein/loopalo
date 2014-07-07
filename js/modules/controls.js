@@ -11,6 +11,7 @@ define('controls', function(require) {
     require('colorpicker');
     require('sortable');
     var canvas = require('canvas');
+    var Line = require('Line');
 
     // ------------------------------------------------------------------------- //
     // Globals
@@ -28,7 +29,7 @@ define('controls', function(require) {
 
         // draw all the lines
         for (var j = 0; j < globals.doc.lineCount; j++) {
-            line = new canvas.Line();
+            line = new Line();
             line.drawPath();
         }
 
@@ -64,7 +65,7 @@ define('controls', function(require) {
             pointerY = event._canvasY;
 
             // make line
-            var line = new canvas.Line({
+            var line = new Line({
                 x : pointerX,
                 y : pointerY
             });
@@ -75,7 +76,7 @@ define('controls', function(require) {
 
             // start interval/timeout
             lineInterval = setInterval(function(){
-                var line = new canvas.Line({
+                var line = new Line({
                     x : pointerX,
                     y : pointerY
                 });
@@ -409,7 +410,7 @@ define('controls', function(require) {
             var val = $this.val();
 
             globals.settings.tileSize = Number(val);
-            setTileSizes();
+            canvas.setTileSizes();
         });
 
         // line length field
