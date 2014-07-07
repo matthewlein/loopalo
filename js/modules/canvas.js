@@ -15,6 +15,7 @@ define('canvas', function(require) {
     // App globals
     // ------------------------------------------------------------------------- //
     var globals = require('globals');
+    var $body = $('body');
 
     // ------------------------------------------------------------------------- //
     // canvas vars
@@ -78,6 +79,7 @@ define('canvas', function(require) {
         drawBg();
     }
 
+
     // ------------------------------------------------------------------------- //
     // Events
     // ------------------------------------------------------------------------- //
@@ -93,6 +95,8 @@ define('canvas', function(require) {
         // resize
         var throttledResize = _.throttle(onResize, 300);
         window.addEventListener('resize', throttledResize, false);
+
+        $body.on('contoller:clearCanvas', clearCanvas);
     }
 
     // ------------------------------------------------------------------------- //
@@ -115,7 +119,6 @@ define('canvas', function(require) {
         canvas : canvas,
         svgWrapper : svgWrapper,
         $svgWrapper : $svgWrapper,
-        clearCanvas : clearCanvas,
         setTileSizes : setTileSizes,
         bgRect : bgRect,
         cWidth : cWidth,

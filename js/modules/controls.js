@@ -18,6 +18,7 @@ define('controls', function(require) {
     // ------------------------------------------------------------------------- //
 
     var globals = require('globals');
+    var $body = $('body');
 
     // ------------------------------------------------------------------------- //
     // Controls
@@ -459,7 +460,9 @@ define('controls', function(require) {
 
         // clear canvas
         var $clearCanvasBtn = $('#clear-canvas');
-        $clearCanvasBtn.on('click', canvas.clearCanvas);
+        $clearCanvasBtn.on('click', function(){
+            $body.trigger('contoller:clearCanvas');
+        });
 
         // add stroke button
         var $addStrokeBtn = $('#add-stroke');
