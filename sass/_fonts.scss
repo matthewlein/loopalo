@@ -7,11 +7,11 @@ $font-open : 'Open Sans', sans-serif;
 //
 @font-face {
     font-family: 'loopalo';
-    src:url('../fonts/loopalo.eot?obhh7m');
-    src:url('../fonts/loopalo.eot?#iefixobhh7m') format('embedded-opentype'),
-        url('../fonts/loopalo.woff?obhh7m') format('woff'),
-        url('../fonts/loopalo.ttf?obhh7m') format('truetype'),
-        url('../fonts/loopalo.svg?obhh7m#loopalo') format('svg');
+    src:url('../fonts/loopalo.eot?-636fdw');
+    src:url('../fonts/loopalo.eot?#iefix-636fdw') format('embedded-opentype'),
+        url('../fonts/loopalo.woff?-636fdw') format('woff'),
+        url('../fonts/loopalo.ttf?-636fdw') format('truetype'),
+        url('../fonts/loopalo.svg?-636fdw#loopalo') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -25,9 +25,10 @@ $font-open : 'Open Sans', sans-serif;
     text-transform: none;
     line-height: 1;
     // customizing
-    font-size: 0.9em;
+    font-size: 1em;
     margin-right: 0.3em;
     margin-left: -0.4em;
+    vertical-align: -1px;
     // Better Font Rendering
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -37,24 +38,49 @@ $font-open : 'Open Sans', sans-serif;
     margin-right: 0;
 }
 
-.icon--pencil:before {
-    content: "\e600";
-}
-.icon--export:before {
-    content: "\e601";
-}
-.icon--settings:before {
-    content: "\e602";
-}
+
+// controller
 .icon--menu {
     font-size: 1.5em;
+    &:before {
+        content: "\e603";
+    }
 }
-.icon--menu:before {
-    content: "\e603";
+.icon--draw {
+    margin-right: 0.1em;
+    &:before {
+        content: "\f040";
+    }
 }
-.icon--close:before {
-    content: "\e604";
+.icon--move:before {
+    content: "\f047";
+}
+.icon--eraser:before {
+    content: "\f12d";
+}
+.icon--bomb:before {
+    content: "\f1e2";
 }
 .icon--plus:before {
-    content: "\e605";
+    content: "\f067";
+}
+.icon--close:before {
+    content: "\f00d";
+}
+
+// menu
+.icon--photo:before {
+    content: "\f03e";
+}
+.icon--download:before {
+    content: "\f019";
+}
+.icon--upload:before {
+    content: "\f093";
+}
+.icon--warning:before {
+    content: "\f071";
+}
+.icon--trash:before {
+    content: "\f014";
 }

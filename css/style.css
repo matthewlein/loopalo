@@ -380,8 +380,8 @@ table {
 
 @font-face {
   font-family: 'loopalo';
-  src: url("../fonts/loopalo.eot?obhh7m");
-  src: url("../fonts/loopalo.eot?#iefixobhh7m") format("embedded-opentype"), url("../fonts/loopalo.woff?obhh7m") format("woff"), url("../fonts/loopalo.ttf?obhh7m") format("truetype"), url("../fonts/loopalo.svg?obhh7m#loopalo") format("svg");
+  src: url("../fonts/loopalo.eot?-636fdw");
+  src: url("../fonts/loopalo.eot?#iefix-636fdw") format("embedded-opentype"), url("../fonts/loopalo.woff?-636fdw") format("woff"), url("../fonts/loopalo.ttf?-636fdw") format("truetype"), url("../fonts/loopalo.svg?-636fdw#loopalo") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -393,9 +393,10 @@ table {
   font-variant: normal;
   text-transform: none;
   line-height: 1;
-  font-size: 0.9em;
+  font-size: 1em;
   margin-right: 0.3em;
   margin-left: -0.4em;
+  vertical-align: -1px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -405,32 +406,58 @@ table {
   margin-right: 0;
 }
 
-.icon--pencil:before {
-  content: "\e600";
-}
-
-.icon--export:before {
-  content: "\e601";
-}
-
-.icon--settings:before {
-  content: "\e602";
-}
-
 .icon--menu {
   font-size: 1.5em;
 }
-
 .icon--menu:before {
   content: "\e603";
 }
 
-.icon--close:before {
-  content: "\e604";
+.icon--draw {
+  margin-right: 0.1em;
+}
+.icon--draw:before {
+  content: "\f040";
+}
+
+.icon--move:before {
+  content: "\f047";
+}
+
+.icon--eraser:before {
+  content: "\f12d";
+}
+
+.icon--bomb:before {
+  content: "\f1e2";
 }
 
 .icon--plus:before {
-  content: "\e605";
+  content: "\f067";
+}
+
+.icon--close:before {
+  content: "\f00d";
+}
+
+.icon--photo:before {
+  content: "\f03e";
+}
+
+.icon--download:before {
+  content: "\f019";
+}
+
+.icon--upload:before {
+  content: "\f093";
+}
+
+.icon--warning:before {
+  content: "\f071";
+}
+
+.icon--trash:before {
+  content: "\f014";
 }
 
 .cf {
@@ -596,7 +623,7 @@ svg path {
 }
 .controller-wrapper {
   float: left;
-  width: 300px;
+  width: 310px;
   position: relative;
   height: 100%;
 }
@@ -650,7 +677,7 @@ svg path {
 .button {
   border: 0;
   outline: 0;
-  padding: 8px 16px;
+  padding: 8px;
   color: #fff;
   display: inline-block;
   vertical-align: middle;
@@ -899,6 +926,8 @@ input {
   right: 0;
   top: 0;
   background-color: #444;
+  border: 1px solid #2b2b2b;
+  border-left: 0;
   width: 75%;
   padding: 20px;
   z-index: 100;

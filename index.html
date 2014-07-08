@@ -29,9 +29,15 @@
             <section class="canvas-settings">
 
                 <div class="modes cf controller__item">
-                    <button class="button button--group button--group--left button--group--active button--1_3" data-mode="draw" id="mode-draw"><i class="icon icon--pencil"></i>Draw</button>
-                    <button class="button button--group button--1_3" data-mode="move" id="mode-move">Move</button>
-                    <button class="button button--group button--group--right button--1_3" data-mode="erase" id="mode-erase">Erase</button>
+                    <button class="button button--group button--group--left button--group--active button--1_3" data-mode="draw" id="mode-draw">
+                        <i class="icon icon--draw"></i>Draw
+                    </button>
+                    <button class="button button--group button--1_3" data-mode="move" id="mode-move">
+                        <i class="icon icon--move"></i>Move
+                    </button>
+                    <button class="button button--group button--group--right button--1_3" data-mode="erase" id="mode-erase">
+                        <i class="icon icon--eraser"></i>Erase
+                    </button>
                 </div>
 
                 <div class="draw-many-wrapper controller__item">
@@ -41,7 +47,9 @@
                 </div>
 
                 <div class="clear-canvas-wrapper controller__item">
-                    <button class="button button--full" id="clear-canvas">Clear canvas</button>
+                    <button class="button button--full" id="clear-canvas">
+                        <i class="icon icon--bomb"></i>Clear canvas
+                    </button>
                 </div>
 
                 <div class="bg-color-wrapper controller__item">
@@ -102,9 +110,9 @@
             <!-- build:remove:prod -->
             <h2>Todo:</h2>
             <ul>
-                <li>design/icons</li>
-                <!-- <li>random/inspire mode</li> -->
-                <!-- <li>export png?</li> -->
+                <li>design?</li>
+                <li>random/inspire mode</li>
+                <li>export png?</li>
             </ul>
             <!-- /build -->
 
@@ -115,12 +123,12 @@
                 <ul class="menu__list">
                     <li class="menu__item">
                         <button class="button button--export button--full" id="export-button">
-                            <i class="icon icon--export"></i>Export SVG
+                            <i class="icon icon--photo"></i>Export SVG
                         </button>
                     </li>
                     <li class="menu__item">
                         <button class="button button--save-settings button--full" id="save-settings">
-                            <i class="icon icon--settings"></i>Save Settings
+                            <i class="icon icon--download"></i>Save Settings
                         </button>
                         <section class="save-dialog save-dialog--hidden arrow arrow--w" id="save-dialog">
                             <label for="save-dialog__name">Name</label>
@@ -132,11 +140,17 @@
                     <li class="menu__item">
                         <ul class="settings-list" id="settings-list">
                         </ul>
-                        <button class="button button--load-settings button--full button--snug" id="load-settings">Load Settings</button>
-                        <button class="button button--delete-settings button--full" id="delete-settings">Delete Settings</button>
+                        <button class="button button--load-settings button--full button--snug" id="load-settings">
+                            <i class="icon icon--upload"></i>Load Settings
+                        </button>
+                        <button class="button button--delete-settings button--full" id="delete-settings">
+                            <i class="icon icon--trash"></i>Delete Settings
+                        </button>
                     </li>
                     <li class="menu__item">
-                        <button class="button button--clear-settings button--full" id="clear-settings">Delete All Saved Settings</button>
+                        <button class="button button--clear-settings button--full" id="clear-settings">
+                            <i class="icon icon--warning"></i>Delete All Saved Settings
+                        </button>
                     </li>
                 </ul>
             </nav>
