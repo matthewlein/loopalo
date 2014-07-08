@@ -14,6 +14,7 @@
     width: 310px;
     position: relative;
     height: 100%;
+    border-right: 1px solid grey;
 }
 
 .controller {
@@ -22,7 +23,6 @@
     height: 100%;
     overflow: auto;
     background-color: #ccc;
-    border-right: 1px solid grey;
 }
 
 .controller__header {
@@ -273,3 +273,5 @@ input {
     background-color: #ccc;
     cursor: move;
 }
+
+

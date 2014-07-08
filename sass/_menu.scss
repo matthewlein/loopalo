@@ -98,3 +98,25 @@ $arrow-color : #ccc;
     color: #fff;
 }
 
+
+
+// --------------------------------------------------------------------- //
+// Footer
+// --------------------------------------------------------------------- //
+
+.menu-footer {
+    padding-top: 20px;
+}
+.made-by {
+    font-size: 0.7em;
+    color: #fff;
+    margin: 0;
+    text-align: center;
+}
+.made-by a {
+    color: #fff;
+
+    &:hover {
+        color: #8EDDF5;
+    }
+}

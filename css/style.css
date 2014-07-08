@@ -626,6 +626,7 @@ svg path {
   width: 310px;
   position: relative;
   height: 100%;
+  border-right: 1px solid grey;
 }
 
 .controller {
@@ -634,7 +635,6 @@ svg path {
   height: 100%;
   overflow: auto;
   background-color: #ccc;
-  border-right: 1px solid grey;
 }
 
 .controller__header {
@@ -1016,6 +1016,24 @@ input {
 .settings-list__item--active {
   background-color: #8EDDF5;
   color: #fff;
+}
+
+.menu-footer {
+  padding-top: 20px;
+}
+
+.made-by {
+  font-size: 0.7em;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+}
+
+.made-by a {
+  color: #fff;
+}
+.made-by a:hover {
+  color: #8EDDF5;
 }
 
 /*# sourceMappingURL=style.css.map */
