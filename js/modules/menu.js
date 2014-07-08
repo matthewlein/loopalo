@@ -52,6 +52,10 @@ define('menu', function(require) {
             $li.data('name', item.name);
             $savedSettingsUI.append($li);
         });
+
+        checkSavedSettingsLength();
+
+        // item clicks
         $savedSettingsUI.on('click', 'li', function() {
             var $this = $(this);
 
@@ -88,11 +92,15 @@ define('menu', function(require) {
     var saveDialogHideClass = 'save-dialog--hidden';
 
     var $saveDialogName = $('#save-dialog__name');
-    $saveDialogName.on('keyup change', function() {
+    $saveDialogName.on('keyup change', function(event) {
         if ( this.value.length ) {
             $saveDialogSave.prop('disabled', false);
         } else {
             $saveDialogSave.prop('disabled', true);
+        }
+        // enter key also runs saveSettings
+        if ( event.which === 13 && !$saveDialogSave.prop('disabled') ) {
+            saveSettings();
         }
     });
 
@@ -102,6 +110,7 @@ define('menu', function(require) {
 
     function saveDialogOpen() {
         $saveDialog.removeClass(saveDialogHideClass);
+        $saveDialogName.focus();
     }
 
     function saveDialogClose() {
@@ -125,6 +134,7 @@ define('menu', function(require) {
             $savedSettingsUI.append($li);
             clearSettingSelection();
             saveDialogClose();
+            checkSavedSettingsLength();
         });
     }
 
@@ -164,6 +174,7 @@ define('menu', function(require) {
             // remove the UI element
             $savedSettingsUI.children().eq(selectedIndex).remove();
             clearSettingSelection();
+            checkSavedSettingsLength();
         })
 
     }
@@ -181,9 +192,17 @@ define('menu', function(require) {
             clearSettingSelection();
             // settings list is empty
             savedSettings = [];
-        })
+        });
     }
-
+    function checkSavedSettingsLength() {
+        if ( !savedSettings.length ) {
+            $clearSettingsBtn.prop('disabled', true);
+        }
+        // if this is the first saved setting, active clear button
+        if ( savedSettings.length >= 1 ) {
+            $clearSettingsBtn.prop('disabled', false);
+        }
+    }
 
     // ------------------------------------------------------------------------- //
     // Exports
@@ -191,7 +210,7 @@ define('menu', function(require) {
 
     function exportSVG() {
 
-        var SVGstring = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + (new XMLSerializer).serializeToString(canvas.canvas.node);
+        var SVGstring = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + (new XMLSerializer()).serializeToString(canvas.canvas.node);
 
         // uses FileSaver script
         saveAs(
