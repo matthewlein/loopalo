@@ -1014,7 +1014,8 @@ input {
 }
 
 .settings-list__item--active {
-  background-color: #ddd;
+  background-color: #8EDDF5;
+  color: #fff;
 }
 
 /*# sourceMappingURL=style.css.map */
