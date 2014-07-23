@@ -6,6 +6,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-connect');
 
+
+
     // don't watch node_modules
     // used in watch files below
     var excludes = [
@@ -16,6 +18,9 @@ module.exports = function(grunt) {
 
         // add excludes to the grunt object
         excludes : excludes,
+
+        // stores secrets off source control
+        superSecrets: grunt.file.readJSON('superSecrets.json'),
 
         // deletes dist/
         clean : ['dist/'],
@@ -50,8 +55,10 @@ module.exports = function(grunt) {
                     mainConfigFile: 'dist/js/main.js',
                     name: 'almond',
                     include: 'main',
+                    // this makes the modules run!
                     insertRequire : ['main'],
-                    out: 'dist/js/main.<%= grunt.config.get("now") %>.js'
+                    out: 'dist/js/main.js'
+                    //out: 'dist/js/main.<%= grunt.config.get("now") %>.js'
                 }
             }
         },
@@ -70,9 +77,46 @@ module.exports = function(grunt) {
             },
         },
 
+        rev: {
+            options: {
+                // encoding: 'utf8',
+                // algorithm: 'md5',
+                // length: 8
+            },
+            assets: {
+                files: [{
+                    src: [
+                        'dist/css/style.css',
+                        'dist/fonts/**/*.{eot,svg,svgz,ttf,woff}',
+                        'dist/img/**/*.{jpg,jpeg,gif,png,svg}',
+                        'dist/js/main.js'
+                    ]
+                }]
+            }
+        },
 
-        // stores secrets off source control
-        superSecrets: grunt.file.readJSON('superSecrets.json'),
+        useminPrepare: {
+            html: 'index.html',
+            css: 'style.css',
+            options: {
+                dest: 'dist/index.html'
+            }
+        },
+        usemin: {
+            html: ['dist/index.html'],
+            css: ['dist/css/*.css'],
+            options: {
+                assetsDir: ['dist/**/*'],
+                patterns: {
+                    // might be needed for ? fonts names? seems to work without it.
+                    // css: [
+                    //     [ /(?:src=|url\(\s*)['"]?([^'"\)\?#]+)['"]?\s*\)?/gm, 'Update the CSS to reference our revved images']
+                    // ]
+                }
+            }
+        },
+
+
 
         // upload to prod
         rsync : {
@@ -174,10 +218,12 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks('grunt-processhtml');
         grunt.loadNpmTasks('grunt-contrib-copy');
         grunt.loadNpmTasks('grunt-contrib-clean');
+        grunt.loadNpmTasks('grunt-rev');
+        grunt.loadNpmTasks('grunt-usemin');
 
         // set now variable for script versioning
-        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
-        grunt.task.run('clean', 'copy', 'requirejs', 'processhtml');
+        // grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+        grunt.task.run('clean', 'copy', 'requirejs', 'processhtml', 'rev', 'usemin');
     });
 
 
@@ -190,15 +236,12 @@ module.exports = function(grunt) {
     // publish live
     grunt.registerTask('publish', [], function() {
         grunt.loadNpmTasks('grunt-contrib-clean');
-        grunt.loadNpmTasks('grunt-contrib-copy');
-        grunt.loadNpmTasks('grunt-contrib-requirejs');
-        grunt.loadNpmTasks('grunt-processhtml');
         grunt.loadNpmTasks('grunt-rsync');
 
         // set now variable for script versioning
-        grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
+        // grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
 
-        grunt.task.run('copy', 'requirejs', 'processhtml', 'rsync', 'clean');
+        grunt.task.run('build', 'rsync', 'clean');
     });
 
 };
