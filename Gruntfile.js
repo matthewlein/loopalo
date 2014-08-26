@@ -95,18 +95,18 @@ module.exports = function(grunt) {
             }
         },
 
-        useminPrepare: {
-            html: 'index.html',
-            css: 'style.css',
-            options: {
-                dest: 'dist/index.html'
-            }
-        },
+        // useminPrepare: {
+        //     html: 'index.html',
+        //     css: 'style.css',
+        //     options: {
+        //         dest: 'dist/index.html'
+        //     }
+        // },
         usemin: {
             html: ['dist/index.html'],
             css: ['dist/css/*.css'],
             options: {
-                assetsDir: ['dist/**/*'],
+                assetsDirs: ['dist/**'],
                 patterns: {
                     // might be needed for ? fonts names? seems to work without it.
                     // css: [
