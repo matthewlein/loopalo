@@ -146,20 +146,30 @@ module.exports = function(grunt) {
 
         // compile sass
         sass: {
-            compile: {
-                options: {
-                    // expanded for dev
-                    style: 'expanded',
-                    // compressed for prod
-                    // style: 'compressed',
-                    // if you're using compass
-                    compass : true,
-                    // set up sourcemaps, requires SASS 3.3 and Compass 1.0alpha?
-                    sourcemap : true
-                },
+            options: {
+                // expanded for dev
+                style: 'expanded',
+                // compressed for prod
+                // style: 'compressed',
+                // if you're using compass
+                compass : true,
+                // set up sourcemaps, requires SASS 3.3 and Compass 1.0alpha?
+                sourcemap : true
+            },
+            dev: {
                 files: {
                     // list your css and corresponding scss pages here
                     // I usually just import all partials into style.scss
+                    'css/style.css' : 'sass/style.scss'
+                }
+            },
+            prod: {
+                options: {
+                    // compressed for prod
+                    style: 'compressed',
+                    sourcemap : false
+                },
+                files: {
                     'css/style.css' : 'sass/style.scss'
                 }
             }
@@ -200,7 +210,7 @@ module.exports = function(grunt) {
                     '<%= excludes %>'
                 ],
                 // compile on change
-                tasks: ['sass']
+                tasks: ['sass:dev']
             }
         }
 
@@ -223,7 +233,7 @@ module.exports = function(grunt) {
 
         // set now variable for script versioning
         // grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
-        grunt.task.run('clean', 'copy', 'requirejs', 'processhtml', 'rev', 'usemin');
+        grunt.task.run('clean', 'sass:prod', 'copy', 'requirejs', 'processhtml', 'rev', 'usemin');
     });
 
 
