@@ -2,7 +2,7 @@
 # Force HTTPS:
 RewriteEngine On
 RewriteCond %{SERVER_PORT} 80
-RewriteRule ^(.*)$ https://domain.com/$1 [R,L]
+RewriteRule ^(.*)$ https://loopalo.com/$1 [R,L]
 
 
 # Apache Server Configs v2.3.0 | MIT License
