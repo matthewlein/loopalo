@@ -6,18 +6,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-connect');
 
-
-
-    // don't watch node_modules
-    // used in watch files below
-    var excludes = [
-        '!**/node_modules/**'
-    ];
-
     grunt.initConfig({
-
-        // add excludes to the grunt object
-        excludes : excludes,
 
         // stores secrets off source control
         superSecrets: grunt.file.readJSON('superSecrets.json'),
@@ -95,13 +84,6 @@ module.exports = function(grunt) {
             }
         },
 
-        // useminPrepare: {
-        //     html: 'index.html',
-        //     css: 'style.css',
-        //     options: {
-        //         dest: 'dist/index.html'
-        //     }
-        // },
         usemin: {
             html: ['dist/index.html'],
             css: ['dist/css/*.css'],
@@ -184,20 +166,17 @@ module.exports = function(grunt) {
             // make a subtask for each filetype to selectively run tasks and livereload
             html: {
                 files: [
-                    '**/*.html',
-                    '<%= excludes %>'
+                    'index.html'
                 ]
             },
             js: {
                 files: [
-                    '**/*.js',
-                    '<%= excludes %>'
+                    '**/*.js'
                 ]
             },
             css: {
                 files: [
-                    'css/*.css',
-                    '<%= excludes %>'
+                    'css/*.css'
                 ]
             },
             // don't livereload sass because we livereload the css
@@ -206,8 +185,7 @@ module.exports = function(grunt) {
                     livereload: false
                 },
                 files: [
-                    'sass/*.scss',
-                    '<%= excludes %>'
+                    'sass/*.scss'
                 ],
                 // compile on change
                 tasks: ['sass:dev']
@@ -231,8 +209,6 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks('grunt-rev');
         grunt.loadNpmTasks('grunt-usemin');
 
-        // set now variable for script versioning
-        // grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
         grunt.task.run('clean', 'sass:prod', 'copy', 'requirejs', 'processhtml', 'rev', 'usemin');
     });
 
@@ -240,6 +216,7 @@ module.exports = function(grunt) {
     grunt.registerTask('copee', [], function() {
         grunt.loadNpmTasks('grunt-contrib-copy');
         grunt.loadNpmTasks('grunt-contrib-clean');
+
         grunt.task.run('clean', 'copy');
     });
 
@@ -247,9 +224,6 @@ module.exports = function(grunt) {
     grunt.registerTask('publish', [], function() {
         grunt.loadNpmTasks('grunt-contrib-clean');
         grunt.loadNpmTasks('grunt-rsync');
-
-        // set now variable for script versioning
-        // grunt.config.set('now', grunt.template.today('yyyy-mm-dd-HH.MM.ss') );
 
         grunt.task.run('build', 'rsync', 'clean');
     });
